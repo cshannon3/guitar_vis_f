@@ -1,16 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'fluttery/gestures.dart';
-import 'package:guitar_vis_f/Component/guitar_widget.dart';
-import 'fluttery/layout.dart';
-import 'package:guitar_vis_f/Component/piano_widget.dart';
 import 'package:guitar_vis_f/Component/infinite_list.dart';
+import '../fluttery/gestures.dart';
 
-List<String> notenames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" ];
-List<int> sharps = [49, 51 ,54,56, 58, 61 , 63, 66, 68, 70];
-//List<int> rootnotes = [0, 5, 10, 15, 19, 24];
-//  low E, A, D, G, B, high E
+import '../fluttery/layout.dart';
+
 List<List<int>> scales = [[0,2,4,5,7,9,11,12], // major Scale
 [0,2,3,5,7,8,10,12], // minor Scale
 [0,2,3,5,7,8,11,12], // harmonic
@@ -25,49 +20,36 @@ List<List<int>> chords = [[0, 4, 7],// major chord
 [0, 5, 7], // sus4
 [0, 3, 6, 9] // dim
 ];
-void main() => runApp(//new game_screen());//TestApp());
-    new MaterialApp(
-      title: "Music App",
-      theme: new ThemeData.dark(),
-      home: new homeScreen(),
-    ));
 
+class InputOptions extends StatefulWidget {
+  final int rootnote;
+  final Function(int rootnote, List<bool> notesShown, int tonalhighlight) onPressed;
 
-class homeScreen extends StatefulWidget {
+  InputOptions({
+    this.rootnote,
+    this.onPressed
+});
   @override
-  _guitarScreenState createState() => new _guitarScreenState();
+  _InputOptionsState createState() => new _InputOptionsState();
 }
 
-class _guitarScreenState extends State<homeScreen> {
+class _InputOptionsState extends State<InputOptions> {
 
-  Widget guitarwidget, pianowidget;
-  List<bool> notesShown = [true,true,true,true,true,true,true,true,true,true,true,true];
-  List<String> _scales = <String>['', 'Major', 'Minor', 'Harmonic', 'Melodic', "Blues"];
+  List<String> _scales = <String>[
+    '', 'Major', 'Minor', 'Harmonic', 'Melodic', "Blues"];
   String _scale = '';
   int currentscale = 0;
   int rootnote = 4;
-  int currenttuning = 0;
-  List<String> _chords = <String>['', 'Major', 'Minor', '7', 'Major 7', 'sus2', 'sus4', 'dim'];
+  int tonalhighlight = 0;
+  List<String> _chords = <String>[
+    '', 'Major', 'Minor', '7', 'Major 7', 'sus2', 'sus4', 'dim'
+  ];
   String _chord = "";
   int currentchord = 0;
-  bool guitarOn = true;
+  List<bool> notesShown = [true,true,true,true,true,true,true,true,true,true,true,true];
 
 
 
-  @override
-  void initState() {
-    super.initState();
-    setState(() {
-      guitarwidget = guitarWidget(rootnote: rootnote,);
-      pianowidget = pianoWidget();
-    });
-
-  }
-
-
-
-
-  // Just for E right now to test it out
   void onScalePressed(int scale, int note){
     for (int m = 0; m < notesShown.length; m++) {
       int c = (m-note<0) ? 12 + (m-note) : m-note;
@@ -78,8 +60,7 @@ class _guitarScreenState extends State<homeScreen> {
       }
     }
     setState(() {
-      guitarwidget = guitarWidget(notesShown: notesShown,tuning: currenttuning,rootnote:  rootnote,);
-      pianowidget = pianoWidget(notesShown: notesShown,rootnote:  rootnote,);
+      widget.onPressed(rootnote, notesShown, tonalhighlight);
     });
   }
   void onChordPressed(int chord, int note){
@@ -92,25 +73,23 @@ class _guitarScreenState extends State<homeScreen> {
       }
     }
     setState(() {
-      guitarwidget = guitarWidget(notesShown: notesShown,tuning: currenttuning,rootnote:  rootnote,);
-      pianowidget = pianoWidget(notesShown: notesShown,rootnote:  rootnote,);
+      widget.onPressed(rootnote, notesShown, tonalhighlight);
     });
   }
 
   void onNotePressed(int note) {
     notesShown[note] = !notesShown[note];
     setState(() {
-      guitarwidget = guitarWidget(notesShown: notesShown,tuning: currenttuning, rootnote: rootnote,);
-      pianowidget = pianoWidget(notesShown: notesShown,rootnote:  rootnote,);
+      widget.onPressed(rootnote, notesShown, tonalhighlight);
     });
 
   }
-  void onPressed(int tonalhighlight) {
+ /* void onPressed(int tonalhighlight) {
     setState(() {
       guitarwidget = guitarWidget(notesShown: notesShown,tuning: currenttuning, rootnote: rootnote, tonalhighlight: tonalhighlight,);
       pianowidget = pianoWidget(notesShown: notesShown,rootnote:  rootnote, tonalhighlight: tonalhighlight,);
     });
-  }
+  }*/
 
   void onNoteSelected(int _rootnote) {
     rootnote = _rootnote;
@@ -127,24 +106,21 @@ class _guitarScreenState extends State<homeScreen> {
 
 //TODO only update the widget that is showing and update other widget only if it becomes the present widget
     setState(() {
-      guitarwidget = guitarWidget(notesShown: notesShown, tuning: currenttuning,);
-      pianowidget = pianoWidget(notesShown: notesShown,);
+      widget.onPressed(rootnote, notesShown, tonalhighlight);
     });
 
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body:
-      Stack(
+    return new Stack(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 50.0),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 8.0, vertical: 50.0),
             child: Column(
               children: <Widget>[
-               /* Text("Octaves"),
+                /* Text("Octaves"),
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: _buildOctaveBar()
@@ -191,8 +167,8 @@ class _guitarScreenState extends State<homeScreen> {
                         setState(() {
                           // newContact.favoriteColor = newValue;
                           _scale = newValue;
-                          currentscale = _scales.indexOf(_scale)-1;
-                          if(currentscale >= 0) {
+                          currentscale = _scales.indexOf(_scale) - 1;
+                          if (currentscale >= 0) {
                             onScalePressed(currentscale, rootnote);
                           } else {
                             showAll();
@@ -207,7 +183,7 @@ class _guitarScreenState extends State<homeScreen> {
                       }).toList(),
                     ), // Dropdown Button
                   ), // DropdownButtonHideUnderline
-                ): Container(), // Input Decorator
+                ) : Container(), // Input Decorator
                 _scale == '' ? new InputDecorator(
                   decoration: const InputDecoration(
                     icon: const Icon(Icons.music_note),
@@ -222,8 +198,8 @@ class _guitarScreenState extends State<homeScreen> {
                         setState(() {
                           // newContact.favoriteColor = newValue;
                           _chord = newValue;
-                          currentchord = _chords.indexOf(_chord)-1;
-                          if(currentchord >= 0) {
+                          currentchord = _chords.indexOf(_chord) - 1;
+                          if (currentchord >= 0) {
                             onChordPressed(currentchord, rootnote);
                           } else {
                             showAll();
@@ -238,7 +214,7 @@ class _guitarScreenState extends State<homeScreen> {
                       }).toList(),
                     ), // Dropdown Button
                   ), // DropdownButtonHideUnderline
-                ): Container(),
+                ) : Container(),
                 /*_scale != '' || _chord != '' ? new InputDecorator(
                   decoration: const InputDecoration(
                     icon: const Icon(Icons.music_note),
@@ -268,47 +244,25 @@ class _guitarScreenState extends State<homeScreen> {
                     ), // Dropdown Button
                   ), // DropdownButtonHideUnderline
                 ) : Container(), // Input Decorator*/
-              _scale != '' || _chord != '' ? InfiniteList(rootnote: rootnote, onPressed: onNoteSelected,): Container(),
+                _scale != '' || _chord != '' ? InfiniteList(
+                  rootnote: rootnote, onPressed: onNoteSelected,) : Container(),
 
 
-
-              ] ,
+              ],
               //mainAxisAlignment: MainAxisAlignment.center,
             ),
           ), // Expanded
           RadialMenu(
             anchor: Offset(200.0, 350.0),
-            onPressed: onPressed,
-    ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                IconButton(
-                    icon: Icon(Icons.print),
-                  onPressed: () {
-                      setState(() {
-                        guitarOn = !guitarOn;
-                      });
-                  },
-
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 50.0),
-                  child: Container(
-                    height: 300.0,
-                    child: guitarOn ? guitarwidget : pianowidget,
-
-                  ),
-                ),
-              ],
-            ),
-          ), // Center
-
-        ],
-      ), // Padding
-    ); //Material App
+            onPressed: (int _tonalhighlight) {
+              setState(() {
+                tonalhighlight = _tonalhighlight;
+                widget.onPressed(rootnote, notesShown, tonalhighlight);
+              });
+            },
+          ),
+        ]
+    );
   }
 }
 
@@ -340,7 +294,7 @@ class AnchoredRadialMenu extends StatefulWidget {
 
   AnchoredRadialMenu({
     this.child,
-});
+  });
   @override
   _AnchoredRadialMenuState createState() => new _AnchoredRadialMenuState();
 }
@@ -366,7 +320,7 @@ class RadialMenu extends StatefulWidget {
 
   RadialMenu({
     this.anchor,
-  this.onPressed,
+    this.onPressed,
   });
 
 
@@ -381,7 +335,7 @@ class _RadialMenuState extends State<RadialMenu> {
     return  Stack(
       children: <Widget>[
         CenterAbout(
-           position: widget.anchor,
+          position: widget.anchor,
           child: FlatButton(onPressed: (){widget.onPressed(0);},
               child: RichText(text: TextSpan(text: "I"),)
           ),
@@ -433,3 +387,4 @@ class _RadialMenuState extends State<RadialMenu> {
     );
   }
 }
+
