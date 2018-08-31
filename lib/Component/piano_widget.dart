@@ -1,10 +1,7 @@
 
 import 'package:flutter/material.dart';
-//import 'package:flame/flame.dart';
+import 'package:guitar_vis_f/shared_info.dart';
 
-List<String> notenames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" ];
-List<int> sharps = [1, 3 ,6,8, 10];
-List<int> majorscale = [0,2,4,5,7,9,11,12,14,16,17,19,21,23,24];
 
 class pianoWidget extends StatefulWidget {
   final List<bool> notesShown;
