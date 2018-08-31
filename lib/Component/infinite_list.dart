@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:guitar_vis_f/main.dart';
+import 'package:guitar_vis_f/shared_info.dart';
 class InfiniteList extends StatefulWidget {
   final int rootnote;
   final Function(int rootnote) onPressed;

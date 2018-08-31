@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:guitar_vis_f/shared_info.dart';
 
-List<String> notenames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" ];
-List<int> rootnotes = [4, 9, 14, 19, 23, 28];
-List<List<int>> tunings = [[4, 9, 14, 19, 23, 28],[2, 9, 14, 19, 23, 28], // Drop D
-[2, 9, 14, 19, 23, 26], // Double drop d
-[2, 7, 14, 19, 23, 26] // open G
-];
 
-List<int> majorscale = [0,2,4,5,7,9,11,12,14,16,17,19,21,23,24];
 
 class guitarWidget extends StatefulWidget {
   final List<bool> notesShown;
