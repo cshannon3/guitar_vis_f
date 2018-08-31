@@ -1,10 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:fluttery/gestures.dart';
+import 'fluttery/gestures.dart';
 import 'package:guitar_vis_f/Component/guitar_widget.dart';
-import 'package:fluttery/layout.dart';
+import 'fluttery/layout.dart';
 import 'package:guitar_vis_f/Component/piano_widget.dart';
+import 'package:guitar_vis_f/Component/infinite_list.dart';
 
 List<String> notenames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" ];
 List<int> sharps = [49, 51 ,54,56, 58, 61 , 63, 66, 68, 70];
@@ -52,10 +53,7 @@ class _guitarScreenState extends State<homeScreen> {
   int currentchord = 0;
   bool guitarOn = true;
 
-  ScrollController _scrollController = new ScrollController();
-  bool isPerformingRequest = false;
-  bool loadingnotes = true;
-  List<Widget> noteButtons;
+
 
   @override
   void initState() {
@@ -63,34 +61,11 @@ class _guitarScreenState extends State<homeScreen> {
     setState(() {
       guitarwidget = guitarWidget(rootnote: rootnote,);
       pianowidget = pianoWidget();
-      noteButtons = _buildNoteButtons();
     });
-    setState(() {
-      loadingnotes = false;
-    });
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
-        _getMoreData();
 
-      }
-    });
-  }
-  _getMoreData() async {
-    if (!isPerformingRequest) {
-      setState(() => isPerformingRequest = true);
-      setState(() {
-        noteButtons.addAll(noteButtons.sublist(0, 11));
-        isPerformingRequest = false;
-      });
-    }
   }
 
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
 
   void onOctavePressed(int octave) {
     octavesShown[octave] = !octavesShown[octave];
@@ -180,52 +155,6 @@ class _guitarScreenState extends State<homeScreen> {
       );
     }
     return octaveBar;
-  }
-  
-  
-  List<Widget> _buildNoteButtons() {
-    List<Widget> noteButtons = [];
-    for (int o = 0; o < notenames.length; ++o) {
-      noteButtons.add(_buildNoteButton(o, rootnote==o));
-    }
-
-    return noteButtons;
-  }
-
-  Widget _buildNoteButton(int note, bool isSelected){
-    return Container(
-        height: 40.0,
-        width: 50.0,
-        decoration: BoxDecoration(
-           border: isSelected ? Border(
-            left: BorderSide(color: Colors.grey, width: 2.0),
-            right: BorderSide(color: Colors.grey, width: 2.0),
-            bottom: BorderSide(color: Colors.white24, width: 2.0),
-            top: BorderSide(color: Colors.white24, width: 2.0),
-          ): Border(), // Border
-        ),
-        child: RaisedButton(
-            onPressed: (){
-              setState(() {
-      // newContact.favoriteColor = newValue;
-
-      rootnote = note;
-      _scale != '' ?
-      onScalePressed(currentscale, rootnote)
-          : onChordPressed(currentchord, rootnote);
-      loadingnotes =true;
-      noteButtons = _buildNoteButtons();
-    });
-              setState(() {
-                loadingnotes = false;
-              });
-    },
-            child: RichText(
-                text: TextSpan(
-                    text: notenames[note])
-            ),
-        )
-    );
   }
 
   @override
@@ -362,42 +291,7 @@ class _guitarScreenState extends State<homeScreen> {
                     ), // Dropdown Button
                   ), // DropdownButtonHideUnderline
                 ) : Container(), // Input Decorator*/
-    _scale != '' || _chord != '' ?Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Text("Root"),
-    ) : Container(),
-    _scale != '' || _chord != ''? Row(
-                  children: <Widget>[
-                    IconButton(
-                      icon: Icon(Icons.arrow_back_ios),
-                      onPressed: (){},
-                    ),
-                    Expanded(child: Container(
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          left: BorderSide(color: Colors.grey, width: 1.0),
-                          right: BorderSide(color: Colors.grey, width: 1.0),
-                          bottom: BorderSide(color: Colors.white24, width: 1.0),
-                          top: BorderSide(color: Colors.white24, width: 1.0),
-                        ), // Border
-                      ), // BoxDecoration
-                      child: loadingnotes ? Container() : ListView.builder(
-                        scrollDirection: Axis.horizontal,
-    itemCount: noteButtons.length,
-    itemBuilder: (context, index) {
-      return noteButtons[index];
-    },
-                        controller: _scrollController,
-                      ),
-    ),
-    ),
-                    IconButton(
-                      icon: Icon(Icons.arrow_forward_ios),
-                      onPressed: (){},
-                    ),
-                  ],
-                ): Container(),
+              _scale != '' || _chord != '' ? InfiniteList(rootnote: rootnote, onPressed: onNoteSelected,): Container(),
 
 
 

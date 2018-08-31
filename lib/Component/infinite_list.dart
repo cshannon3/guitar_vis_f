@@ -96,7 +96,7 @@ class _InfiniteListState extends State<InfiniteList> {
 
   @override
   Widget build(BuildContext context) {
-    return new _scale != '' || _chord != ''? Row(
+    return new Row(
       children: <Widget>[
         IconButton(
           icon: Icon(Icons.arrow_back_ios),
@@ -127,6 +127,6 @@ class _InfiniteListState extends State<InfiniteList> {
           onPressed: (){},
         ),
       ],
-    ): Container();
+    );
   }
 }
