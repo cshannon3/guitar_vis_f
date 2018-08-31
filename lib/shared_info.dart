@@ -1,5 +1,7 @@
 // Any list of music related stuff that might be accessed by multiple widgets
 
+import 'package:flutter/material.dart';
+
 List<String> notenames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" ];
 List<int> sharps = [1, 3 ,6,8, 10];
 List<int> majorscale = [0,2,4,5,7,9,11,12,14,16,17,19,21,23,24];
@@ -26,3 +28,7 @@ List<List<int>> chords = [[0, 4, 7],// major chord
 [0, 5, 7], // sus4
 [0, 3, 6, 9] // dim
 ];
+
+Color getColor(double tnote) {
+  return Color.lerp(Colors.red, Colors.blue, tnote / 12);
+}

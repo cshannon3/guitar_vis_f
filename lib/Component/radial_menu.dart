@@ -3,7 +3,7 @@ import '../fluttery/gestures.dart';
 
 import '../fluttery/layout.dart';
 import 'dart:math';
-
+import 'package:guitar_vis_f/shared_info.dart';
 class PolarPosition extends StatelessWidget {
   final Offset origin;
   final PolarCoord coord;
@@ -51,7 +51,6 @@ class _AnchoredRadialMenuState extends State<AnchoredRadialMenu> {
   }
 }
 
-
 class RadialMenu extends StatefulWidget {
   final Offset anchor;
   final Function(int tonalhighlight) onPressed;
@@ -77,7 +76,37 @@ class _RadialMenuState extends State<RadialMenu> {
   void initState() {
     super.initState();
     rootnote = widget.rootnote;
+  }
+  List<Widget> _buildRoundButtons() {
+    List<PolarPosition> buttons = [];
+    List<String> names = ["I", "ii", "iii", "IV", "V", "vi"/*, "vii"*/];
+    List<PolarCoord> coords = [PolarCoord(-pi/2, 100.0),PolarCoord(-pi/2 + (pi /4), 60.0), PolarCoord(-pi/2 + (7* pi /4), 60.0),PolarCoord(-pi/2+ (7*pi/4), 120.0),
+    PolarCoord(-pi/2+ (pi/4), 120.0),PolarCoord(-pi/2, 50.0)];
+    for(int i = 0; i<names.length;++i){
+      buttons.add(_buildRoundButton(names[i], coords[i], i));
+    }
+    return buttons;
 
+  }
+
+  Widget _buildRoundButton(String name, PolarCoord coord, int index) {
+
+    return PolarPosition(
+      origin: widget.anchor,
+      coord: coord,
+      child:  GestureDetector(
+        onTap:  (){widget.onPressed(index);},
+        child: new Container(
+            width: 50.0,
+            height: 50.0,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: getColor(((widget.rootnote+majorscale[index])%12).toDouble()),
+            ), // Box Decoration
+            child: Center(child: RichText(text: TextSpan(text: "${notenames[(widget.rootnote+majorscale[index])%12]}($name)"),))
+        ),
+      ),
+    );
   }
   @override
   Widget build(BuildContext context) {
@@ -86,52 +115,11 @@ class _RadialMenuState extends State<RadialMenu> {
         CenterAbout(
           position: widget.anchor,
           child: FlatButton(onPressed: (){widget.onPressed(0);},
-              child: RichText(text: TextSpan(text: "I"),)
+              child: RichText(text: TextSpan(text: "${notenames[(widget.rootnote+majorscale[0])%12]}(I)"),)
           ),
         ), // CenterAbout
-        PolarPosition(
-          origin: widget.anchor,
-          coord: PolarCoord(-pi/2, 50.0),
-          child:  FlatButton(onPressed: (){widget.onPressed(5);},
-              child: RichText(text: TextSpan(text: "vi"),)
-          ),
-        ),
-        PolarPosition(
-          origin: widget.anchor,
-          coord: PolarCoord(-pi/2, 100.0),
-          child:  FlatButton(onPressed: (){widget.onPressed(0);},
-              child: RichText(text: TextSpan(text: "I"),)
-          ),
-        ),
-        PolarPosition(
-          origin: widget.anchor,
-          coord: PolarCoord(-pi/2 + (pi /4), 60.0),
-          child:  FlatButton(onPressed: (){widget.onPressed(1);},
-              child: RichText(text: TextSpan(text: "ii"),)
-          ),
-        ),
-        PolarPosition(
-          origin: widget.anchor,
-          coord: PolarCoord(-pi/2+ (pi/4), 120.0),
-          child:  FlatButton(onPressed: (){widget.onPressed(4);},
-              child: RichText(text: TextSpan(text: "V"),)
-          ),
-        ),
-        PolarPosition(
-          origin: widget.anchor,
-          coord: PolarCoord(-pi/2 + (7* pi /4), 60.0),
-          child: FlatButton(onPressed: (){widget.onPressed(2);},
-              child: RichText(text: TextSpan(text: "iii"),)
-          ),
-        ),
-        PolarPosition(
-          origin: widget.anchor,
-          coord: PolarCoord(-pi/2+ (7*pi/4), 120.0),
-          child: FlatButton(onPressed: (){widget.onPressed(3);},
-              child: RichText(text: TextSpan(text: "IV"),)
-          ),
-        ),
-      ],
+      ]
+        ..addAll(_buildRoundButtons()),
 
     );
   }
