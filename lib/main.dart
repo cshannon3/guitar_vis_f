@@ -14,7 +14,6 @@ void main() => runApp(//new game_screen());//TestApp());
       home: new homeScreen(),
     ));
 
-
 class homeScreen extends StatefulWidget {
   @override
   _guitarScreenState createState() => new _guitarScreenState();
@@ -75,11 +74,7 @@ class _guitarScreenState extends State<homeScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 50.0),
-                  child: Container(
-                    height: 300.0,
-                    child: guitarOn ? guitarwidget : pianowidget,
-
-                  ),
+                  child:  guitarOn ? guitarwidget : pianowidget,
                 ),
               ],
             ),

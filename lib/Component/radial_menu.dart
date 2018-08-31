@@ -97,8 +97,8 @@ class _RadialMenuState extends State<RadialMenu> {
       child:  GestureDetector(
         onTap:  (){widget.onPressed(index);},
         child: new Container(
-            width: 50.0,
-            height: 50.0,
+            width: 40.0,
+            height: 40.0,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: getColor(((widget.rootnote+majorscale[index])%12).toDouble()),
