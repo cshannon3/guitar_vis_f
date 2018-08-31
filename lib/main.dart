@@ -28,16 +28,16 @@ void main() => runApp(//new game_screen());//TestApp());
     new MaterialApp(
       title: "Music App",
       theme: new ThemeData.dark(),
-      home: new guitarScreen(),
+      home: new homeScreen(),
     ));
 
 
-class guitarScreen extends StatefulWidget {
+class homeScreen extends StatefulWidget {
   @override
   _guitarScreenState createState() => new _guitarScreenState();
 }
 
-class _guitarScreenState extends State<guitarScreen> {
+class _guitarScreenState extends State<homeScreen> {
 
   Widget guitarwidget, pianowidget;
   List<bool> octavesShown = [true,true,true,true];
@@ -46,9 +46,6 @@ class _guitarScreenState extends State<guitarScreen> {
   String _scale = '';
   int currentscale = 0;
   int rootnote = 4;
-  String _rootname = "E";
-  String _tuning = "Standard";
-  List<String> _tunings = ["Standard", "Drop D", "Double Drop D", "Open G"];
   int currenttuning = 0;
   List<String> _chords = <String>['', 'Major', 'Minor', '7', 'Major 7', 'sus2', 'sus4', 'dim'];
   String _chord = "";
@@ -74,7 +71,7 @@ class _guitarScreenState extends State<guitarScreen> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
         _getMoreData();
-        print(_scrollController.position.pixels);
+
       }
     });
   }
@@ -87,6 +84,7 @@ class _guitarScreenState extends State<guitarScreen> {
       });
     }
   }
+
 
   @override
   void dispose() {
@@ -145,7 +143,11 @@ class _guitarScreenState extends State<guitarScreen> {
     });
   }
 
-
+  void onNoteSelected(int _rootnote) {
+    _scale != '' ?
+    onScalePressed(currentscale, rootnote)
+        : onChordPressed(currentchord, rootnote);
+  }
 
   void showAll() {
     for (int m = 0; m < notesShown.length; m++) {
