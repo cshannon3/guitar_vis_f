@@ -12,6 +12,7 @@ class guitarWidget extends StatefulWidget {
   final int currentscale;
 
 
+
   guitarWidget({
     this.notesShown = const[true,true,true,true,true,true,true,true,true,true,true,true],
     this.octavesShown = const [true,true,true,true],
@@ -32,15 +33,33 @@ class _guitarWidgetState extends State<guitarWidget> {
   List<Widget> Frets;
   bool loaded = false;
   int fretsshown = 6;
+  int rootindex;
+  List<int> newScale= [];
+
+
+
+  List<int> _buildnewscale(int root) {
+    List<int> scale = [];
+    for (int i=0; i<7;i++){
+      scale.add((root+scales[widget.currentscale][i])%12);
+    }
+    return scale;
+
+  }
+  List<int> _buildhighlights(){
+    return
+    [(widget.rootnote + scales[widget.currentscale][widget.tonalhighlight]) % 12,
+    (widget.rootnote + scales[widget.currentscale][widget.tonalhighlight + 2]) % 12,
+    (widget.rootnote + scales[widget.currentscale][widget.tonalhighlight + 4]) % 12
+    ];
+  }
 
   @override
   void initState() {
     setState(() {
-      (widget.rootnote != -1) ? noteshighlighted =
-      [(widget.rootnote + scales[widget.currentscale][widget.tonalhighlight]) % 12,
-      (widget.rootnote + scales[widget.currentscale][widget.tonalhighlight + 2]) % 12,
-      (widget.rootnote + scales[widget.currentscale][widget.tonalhighlight + 4]) % 12
-      ] : [];
+      rootindex = scales[widget.currentscale].indexOf(widget.rootnote%12);
+      newScale = (widget.rootnote != -1) ? _buildnewscale(widget.rootnote): List<int>.generate(11, (i) => i + 1) ;
+      (widget.rootnote != -1) ? noteshighlighted = _buildhighlights():[];
     });
     setState(() {
       loaded = true;
@@ -51,20 +70,13 @@ class _guitarWidgetState extends State<guitarWidget> {
   @override
   void didUpdateWidget(guitarWidget oldWidget) {
     setState(() {
-      (widget.rootnote != -1) ? noteshighlighted =
-      [(widget.rootnote + scales[widget.currentscale][widget.tonalhighlight]) % 12,
-      (widget.rootnote + scales[widget.currentscale][widget.tonalhighlight + 2]) % 12,
-      (widget.rootnote + scales[widget.currentscale][widget.tonalhighlight + 4]) % 12
-      ] : [];
-
-
-      print(noteshighlighted);
+      newScale = (widget.rootnote != -1) ? _buildnewscale(widget.rootnote): List<int>.generate(11, (i) => i + 1) ;
+      (widget.rootnote != -1) ? noteshighlighted = _buildhighlights():[];
     });
   }
 
   List<Widget> _buildFrets(double _screenwidth) {
     double fretwidth = _screenwidth / fretsshown;
-    print(fretwidth);
     List<Widget> frets = [];
     for (int fret = 0; fret < 13; ++fret) {
       frets.add(_buildFret(fret, fretwidth));
@@ -112,7 +124,8 @@ class _guitarWidgetState extends State<guitarWidget> {
       int note = tunings[tuning][string] + fretnum;
       (widget.notesShown[note % 12] && widget.octavesShown[(note / 12).floor()])
 
-          ? notes.add(noteWidget(note, string, fretwidth,
+          ?
+    notes.add(noteWidget(note, string, fretwidth,
           noteshighlighted.isEmpty ? false : noteshighlighted.contains(
               note % 12)))
 
@@ -123,6 +136,7 @@ class _guitarWidgetState extends State<guitarWidget> {
   }
 
   Widget noteWidget(int notenum, int string, double fretwidth, bool highlight) {
+    int val = (newScale.contains(notenum%12)) ? newScale.indexOf(notenum%12) : null;
     return GestureDetector(
       onTap: () => onPressed(notenum, string),
       child: Stack(
@@ -130,6 +144,11 @@ class _guitarWidgetState extends State<guitarWidget> {
             Center(
               child: Divider(height: fretwidth * (2 / 3), color: Colors.black,),
             ),
+           /* (newScale.contains(notenum%12)) ? Container(
+              width: fretwidth*(newScale.indexOf(notenum%12))/7,
+              height: fretwidth*(2 / 3)*(7- newScale.indexOf(notenum%12))/7,
+              color: Colors.green,
+            ): Container(),*/
             Padding(
               padding: const EdgeInsets.only(top: 5.0),
               child: Opacity(
@@ -139,20 +158,17 @@ class _guitarWidgetState extends State<guitarWidget> {
                     width: highlight ? 36.0 - fretsshown : 32.0 - fretsshown,
                     height: highlight ? 36.0 - fretsshown : 32.0 - fretsshown,
                     decoration: BoxDecoration(
-
                       color: getColor((notenum % 12).toDouble()),
                       shape: BoxShape.circle,
                       border: highlight ? new Border.all(
                         color: Colors.white,
                         width: 2.5,
                       ) : Border(),
-
-
                     ), // Box Decoration
 
                     child: Center(child: RichText(
                       text: TextSpan(
-                        text: notenames[notenum % 12],
+                        text: "${val ?? ""} ${notenames[notenum % 12]}",
                         style: TextStyle(fontSize: 12.0,
                             color: highlight ? Colors.black : Colors.white,
                             fontStyle: highlight ? FontStyle.normal : FontStyle
