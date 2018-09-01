@@ -9,6 +9,8 @@ class guitarWidget extends StatefulWidget {
   final int tuning;
   final int rootnote;
   final int tonalhighlight;
+  final int currentscale;
+
 
 
   guitarWidget({
@@ -17,6 +19,7 @@ class guitarWidget extends StatefulWidget {
     this.tuning = 0,
     this.rootnote = -1,
     this.tonalhighlight =0,
+    this.currentscale = 0,
   });
 
   @override
@@ -25,21 +28,38 @@ class guitarWidget extends StatefulWidget {
 
 class _guitarWidgetState extends State<guitarWidget> {
 
-  List<int> noteshighlighted ;
+  List<int> noteshighlighted;
+
   List<Widget> Frets;
   bool loaded = false;
   int fretsshown = 6;
+  int rootindex;
+  List<int> newScale= [];
+
+
+
+  List<int> _buildnewscale(int root) {
+    List<int> scale = [];
+    for (int i=0; i<7;i++){
+      scale.add((root+scales[widget.currentscale][i])%12);
+    }
+    return scale;
+
+  }
+  List<int> _buildhighlights(){
+    return
+    [(widget.rootnote + scales[widget.currentscale][widget.tonalhighlight]) % 12,
+    (widget.rootnote + scales[widget.currentscale][widget.tonalhighlight + 2]) % 12,
+    (widget.rootnote + scales[widget.currentscale][widget.tonalhighlight + 4]) % 12
+    ];
+  }
 
   @override
   void initState() {
-
     setState(() {
-
-      (widget.rootnote != -1) ? noteshighlighted = [(widget.rootnote+majorscale[widget.tonalhighlight])%12,
-                                          (widget.rootnote+majorscale[widget.tonalhighlight + 2])%12,
-                                            (widget.rootnote+majorscale[widget.tonalhighlight+ 4])%12] : [];
-
-
+      rootindex = scales[widget.currentscale].indexOf(widget.rootnote%12);
+      newScale = (widget.rootnote != -1) ? _buildnewscale(widget.rootnote): List<int>.generate(11, (i) => i + 1) ;
+      (widget.rootnote != -1) ? noteshighlighted = _buildhighlights():[];
     });
     setState(() {
       loaded = true;
@@ -47,33 +67,28 @@ class _guitarWidgetState extends State<guitarWidget> {
   }
 
 
- @override
+  @override
   void didUpdateWidget(guitarWidget oldWidget) {
     setState(() {
-      (widget.rootnote != -1) ? noteshighlighted = [(widget.rootnote+majorscale[widget.tonalhighlight])%12,
-      (widget.rootnote+majorscale[widget.tonalhighlight + 2])%12,
-      (widget.rootnote+majorscale[widget.tonalhighlight+ 4])%12] : [];
-
-
-      print(noteshighlighted);
+      newScale = (widget.rootnote != -1) ? _buildnewscale(widget.rootnote): List<int>.generate(11, (i) => i + 1) ;
+      (widget.rootnote != -1) ? noteshighlighted = _buildhighlights():[];
     });
   }
 
   List<Widget> _buildFrets(double _screenwidth) {
-    double fretwidth = _screenwidth/fretsshown;
-    print(fretwidth);
+    double fretwidth = _screenwidth / fretsshown;
     List<Widget> frets = [];
-    for (int fret = 0; fret< 13; ++fret) {
+    for (int fret = 0; fret < 13; ++fret) {
       frets.add(_buildFret(fret, fretwidth));
     }
     return frets;
-
   }
 
 
   void onPressed(int note, int string) {
-    print(" note is ${notenames[note%12]} on the ${string+1} string");
+    print(" note is ${notenames[note % 12]} on the ${string + 1} string");
   }
+
   Widget _buildFret(int fretnum, double fretwidth) {
     return new Container(
         width: fretwidth,
@@ -88,88 +103,102 @@ class _guitarWidgetState extends State<guitarWidget> {
         ),
         padding: EdgeInsets.all(1.0),
         child: Column(
-            children: _buildNotes(fretnum, widget.tuning, fretwidth)..add(
-                Container( child: RichText(
-                  text: TextSpan(
-                    text: "$fretnum",
-                    style: TextStyle(fontSize: 10.0, color: Colors.black, fontStyle: FontStyle.normal),
-                  ), // TextSpan
-                ), // Rich Text))
-                )
-            )));
+            children: _buildNotes(fretnum, widget.tuning, fretwidth)
+              ..add(
+                  Container(child: RichText(
+                    text: TextSpan(
+                      text: "$fretnum",
+                      style: TextStyle(fontSize: 10.0,
+                          color: Colors.black,
+                          fontStyle: FontStyle.normal),
+                    ), // TextSpan
+                  ), // Rich Text))
+                  )
+              )));
   }
 
   List<Widget> _buildNotes(int fretnum, int tuning, double fretwidth) {
-
     List<Widget> notes = [];
-    for (int string = 0; string<6; ++string) { // High e to low e
+    for (int string = 0; string < 6; ++string) { // High e to low e
       // for (int string = 5; string>=0; --string) {
       int note = tunings[tuning][string] + fretnum;
-      (widget.notesShown[note%12] && widget.octavesShown[(note/12).floor()])
+      (widget.notesShown[note % 12] && widget.octavesShown[(note / 12).floor()])
 
-          ? notes.add(noteWidget(note, string, fretwidth, noteshighlighted.isEmpty ? false : noteshighlighted.contains(note%12)))
+          ?
+    notes.add(noteWidget(note, string, fretwidth,
+          noteshighlighted.isEmpty ? false : noteshighlighted.contains(
+              note % 12)))
 
-          : notes.add(Container(height: fretwidth*(2/3)/*45.0*/,child: Divider(height: 40.0, color: Colors.black,),));
+          : notes.add(Container(height: fretwidth * (2 / 3) /*45.0*/,
+        child: Divider(height: fretwidth * (2 / 3), color: Colors.black,),));
     }
     return notes;
-
   }
 
-  Widget noteWidget(int notenum, int string, double fretwidth,  bool highlight) {
-
+  Widget noteWidget(int notenum, int string, double fretwidth, bool highlight) {
+    int val = (newScale.contains(notenum%12)) ? newScale.indexOf(notenum%12) : null;
     return GestureDetector(
       onTap: () => onPressed(notenum, string),
       child: Stack(
           children: <Widget>[
-            Center(child: Divider(height: fretwidth*(2/3), color: Colors.black,),
+            Center(
+              child: Divider(height: fretwidth * (2 / 3), color: Colors.black,),
             ),
+           /* (newScale.contains(notenum%12)) ? Container(
+              width: fretwidth*(newScale.indexOf(notenum%12))/7,
+              height: fretwidth*(2 / 3)*(7- newScale.indexOf(notenum%12))/7,
+              color: Colors.green,
+            ): Container(),*/
             Padding(
-              padding: const EdgeInsets.only( top: 5.0),
+              padding: const EdgeInsets.only(top: 5.0),
               child: Opacity(
-                opacity: highlight ?0.9 : 0.6,
+                opacity: highlight ? 0.9 : 0.6,
                 child: Center(
                   child: Container(
-                    width: highlight ? 36.0-fretsshown:32.0-fretsshown,
-                    height: highlight ? 36.0-fretsshown:32.0-fretsshown,
+                    width: highlight ? 36.0 - fretsshown : 32.0 - fretsshown,
+                    height: highlight ? 36.0 - fretsshown : 32.0 - fretsshown,
                     decoration: BoxDecoration(
-
-                      color: getColor((notenum%12).toDouble()),
+                      color: getColor((notenum % 12).toDouble()),
                       shape: BoxShape.circle,
-                      border: highlight ?new Border.all(
+                      border: highlight ? new Border.all(
                         color: Colors.white,
                         width: 2.5,
-                      ):Border(),
-
-
+                      ) : Border(),
                     ), // Box Decoration
 
                     child: Center(child: RichText(
                       text: TextSpan(
-                        text: notenames[notenum%12],
-                        style: TextStyle(fontSize: 12.0, color: highlight ?Colors.black: Colors.white, fontStyle: highlight ?FontStyle.normal : FontStyle.normal),
+                        text: "${val ?? ""} ${notenames[notenum % 12]}",
+                        style: TextStyle(fontSize: 12.0,
+                            color: highlight ? Colors.black : Colors.white,
+                            fontStyle: highlight ? FontStyle.normal : FontStyle
+                                .normal),
                       ), // TextSpan
                     ), // Rich Text
                     ), // Center
                   ),
                 ),
-              ),  // Container
+              ), // Container
             ), // Padding
 
           ]
       ),
-    );  //Stack
+    ); //Stack
   }
 
   @override
   Widget build(BuildContext context) {
-    final double screen_width = MediaQuery.of(context).size.width;
+    final double screen_width = MediaQuery
+        .of(context)
+        .size
+        .width;
     print(screen_width);
     return new Container(
-        height: 300.0,
-        child: ListView(
-      scrollDirection: Axis.horizontal,
-      children: loaded ? _buildFrets(screen_width): [],
-        ),
+      height: 300.0,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: loaded ? _buildFrets(screen_width) : [],
+      ),
 
     ); // ListView;
   }

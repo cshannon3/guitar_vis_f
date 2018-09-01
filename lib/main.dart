@@ -16,10 +16,10 @@ void main() => runApp(//new game_screen());//TestApp());
 
 class homeScreen extends StatefulWidget {
   @override
-  _guitarScreenState createState() => new _guitarScreenState();
+  _homeScreenState createState() => new _homeScreenState();
 }
 
-class _guitarScreenState extends State<homeScreen> {
+class _homeScreenState extends State<homeScreen> {
 
   Widget guitarwidget, pianowidget;
   List<bool> notesShown = [true,true,true,true,true,true,true,true,true,true,true,true];
@@ -40,14 +40,23 @@ class _guitarScreenState extends State<homeScreen> {
     });
   }
 
-  void onInputChanged(int _rootnote, List<bool> _notesShown, int _tonalhighlight) {
+  void onInputChanged(int _rootnote, List<bool> _notesShown, int _tonalhighlight, int _currentscale) {
 
     setState(() {
       notesShown = _notesShown;
       rootnote = _rootnote;
       tonalhighlight = _tonalhighlight;
-      guitarwidget = guitarWidget(notesShown: notesShown,rootnote:  rootnote,tonalhighlight: _tonalhighlight,);
-      pianowidget = pianoWidget(notesShown: notesShown,rootnote:  rootnote, tonalhighlight: _tonalhighlight,);
+      currentscale = _currentscale;
+      guitarwidget = guitarWidget(
+          notesShown: notesShown,
+          rootnote:  rootnote,
+          tonalhighlight: _tonalhighlight,
+          currentscale: currentscale,);
+      pianowidget = pianoWidget(
+          notesShown: notesShown,
+          rootnote:  rootnote,
+          tonalhighlight: _tonalhighlight,
+          currentscale: currentscale,);
     });
 
   }

@@ -9,7 +9,7 @@ import 'package:guitar_vis_f/shared_info.dart';
 
 class InputOptions extends StatefulWidget {
   final int rootnote;
-  final Function(int rootnote, List<bool> notesShown, int tonalhighlight) onPressed;
+  final Function(int rootnote, List<bool> notesShown, int tonalhighlight, int _scale) onPressed;
 
   InputOptions({
     this.rootnote,
@@ -32,44 +32,45 @@ class _InputOptionsState extends State<InputOptions> {
   ];
   String _chord = "";
   int currentchord = 0;
-  List<bool> notesShown = [true,true,true,true,true,true,true,true,true,true,true,true];
+  List<bool> notesShown = [
+    true, true, true, true, true, true, true, true, true, true, true, true];
 
 
-
-  void onScalePressed(int scale, int note){
+  void onScalePressed(int scale, int note) {
     for (int m = 0; m < notesShown.length; m++) {
-      int c = (m-note<0) ? 12 + (m-note) : m-note;
+      int c = (m - note < 0) ? 12 + (m - note) : m - note;
       if (scales[scale].contains(c)) {
         notesShown[m] = true;
-      } else{
+      } else {
         notesShown[m] = false;
       }
     }
     setState(() {
-      widget.onPressed(rootnote, notesShown, tonalhighlight);
+      print(scale);
+      widget.onPressed(rootnote, notesShown, tonalhighlight, scale);
     });
   }
-  void onChordPressed(int chord, int note){
+
+  void onChordPressed(int chord, int note) {
     for (int m = 0; m < notesShown.length; m++) {
-      int c = (m-note<0) ? 12 + (m-note) : m-note;
+      int c = (m - note < 0) ? 12 + (m - note) : m - note;
       if (chords[chord].contains(c)) {
         notesShown[m] = true;
-      } else{
+      } else {
         notesShown[m] = false;
       }
     }
     setState(() {
-      widget.onPressed(rootnote, notesShown, tonalhighlight);
+      widget.onPressed(rootnote, notesShown, tonalhighlight, currentscale);
     });
   }
 
 
- void onPressed(int _tonalhighlight) {
-   tonalhighlight = _tonalhighlight;
-   setState(() {
-     print(tonalhighlight);
-     widget.onPressed(rootnote, notesShown, tonalhighlight);
-   });
+  void onPressed(int _tonalhighlight) {
+    tonalhighlight = _tonalhighlight;
+    setState(() {
+      widget.onPressed(rootnote, notesShown, tonalhighlight, currentscale);
+    });
   }
 
   void onNoteSelected(int _rootnote) {
@@ -86,9 +87,8 @@ class _InputOptionsState extends State<InputOptions> {
     _scale = '';
 
     setState(() {
-      widget.onPressed(rootnote, notesShown, tonalhighlight);
+      widget.onPressed(rootnote, notesShown, tonalhighlight, currentscale);
     });
-
   }
 
   @override
@@ -162,16 +162,19 @@ class _InputOptionsState extends State<InputOptions> {
                     ), // Dropdown Button
                   ), // DropdownButtonHideUnderline
                 ) : Container(),
-                _scale != '' || _chord != '' ? InfiniteList(
-                  rootnote: rootnote, onPressed: onNoteSelected,) : Container(),
+                _scale != '' || _chord != '' ?
+                  InfiniteList(
+                    rootnote: rootnote,
+                    onPressed: onNoteSelected,
+                  ) : Container(),
               ],
             ),
           ), // Expanded
-          RadialMenu(
+          _scale != '' ? RadialMenu(
             anchor: Offset(200.0, 350.0),
             onPressed: onPressed,
             rootnote: rootnote,
-          ),
+          ) : Container(),
         ]
     );
   }

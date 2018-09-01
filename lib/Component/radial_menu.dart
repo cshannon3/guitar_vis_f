@@ -79,9 +79,9 @@ class _RadialMenuState extends State<RadialMenu> {
   }
   List<Widget> _buildRoundButtons() {
     List<PolarPosition> buttons = [];
-    List<String> names = ["I", "ii", "iii", "IV", "V", "vi"/*, "vii"*/];
-    List<PolarCoord> coords = [PolarCoord(-pi/2, 100.0),PolarCoord(-pi/2 + (pi /4), 60.0), PolarCoord(-pi/2 + (7* pi /4), 60.0),PolarCoord(-pi/2+ (7*pi/4), 120.0),
-    PolarCoord(-pi/2+ (pi/4), 120.0),PolarCoord(-pi/2, 50.0)];
+    List<String> names = ["(I)", "m(ii)", "m(iii)", "(IV)", "(V)", "m(vi)"/*, "vii"*/];
+    List<PolarCoord> coords = [PolarCoord(-pi/2, 120.0),PolarCoord(-pi/2 + (pi /4), 80.0), PolarCoord(-pi/2 + (7* pi /4), 80.0),PolarCoord(-pi/2+ (7*pi/4), 140.0),
+    PolarCoord(-pi/2+ (pi/4), 140.0),PolarCoord(-pi/2, 60.0)];
     for(int i = 0; i<names.length;++i){
       buttons.add(_buildRoundButton(names[i], coords[i], i));
     }
@@ -97,13 +97,13 @@ class _RadialMenuState extends State<RadialMenu> {
       child:  GestureDetector(
         onTap:  (){widget.onPressed(index);},
         child: new Container(
-            width: 40.0,
-            height: 40.0,
+            width: 55.0,
+            height: 55.0,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: getColor(((widget.rootnote+majorscale[index])%12).toDouble()),
             ), // Box Decoration
-            child: Center(child: RichText(text: TextSpan(text: "${notenames[(widget.rootnote+majorscale[index])%12]}($name)"),))
+            child: Center(child: RichText(text: TextSpan(text: "${notenames[(widget.rootnote+majorscale[index])%12]}$name"),))
         ),
       ),
     );
