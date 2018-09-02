@@ -4,22 +4,24 @@ import 'package:guitar_vis_f/shared_info.dart';
 
 
 class guitarWidget extends StatefulWidget {
-  final List<bool> notesShown;
-  final List<bool> octavesShown;
+  //final List<bool> notesShown;
+  //final List<bool> octavesShown;
   final int tuning;
   final int rootnote;
   final int tonalhighlight;
   final int currentscale;
+  final int currentchord;
 
 
 
   guitarWidget({
-    this.notesShown = const[true,true,true,true,true,true,true,true,true,true,true,true],
-    this.octavesShown = const [true,true,true,true],
+   // this.notesShown = const[true,true,true,true,true,true,true,true,true,true,true,true],
+   // this.octavesShown = const [true,true,true,true],
     this.tuning = 0,
     this.rootnote = -1,
     this.tonalhighlight =0,
-    this.currentscale = 0,
+    this.currentscale = -1,
+    this.currentchord = -1,
   });
 
   @override
@@ -28,38 +30,59 @@ class guitarWidget extends StatefulWidget {
 
 class _guitarWidgetState extends State<guitarWidget> {
 
-  List<int> noteshighlighted;
+  //List<int> noteshighlighted;
 
-  List<Widget> Frets;
+  //List<Widget> Frets;
   bool loaded = false;
   int fretsshown = 6;
   int rootindex;
-  List<int> newScale= [];
+  List<int> scalenotes = [];
+  List<int> chordnotes = [];
+  bool showall = true;
 
 
 
-  List<int> _buildnewscale(int root) {
+  List<int> _buildscalenoteslist(int _root, int _currentscale) {
     List<int> scale = [];
     for (int i=0; i<7;i++){
-      scale.add((root+scales[widget.currentscale][i])%12);
+      scale.add((_root+scales[_currentscale][i])%12);
     }
     return scale;
-
   }
-  List<int> _buildhighlights(){
+  List<int> _buildhighlights(int _root, int _currentscale, int _tonalhighlight){
     return
-    [(widget.rootnote + scales[widget.currentscale][widget.tonalhighlight]) % 12,
-    (widget.rootnote + scales[widget.currentscale][widget.tonalhighlight + 2]) % 12,
-    (widget.rootnote + scales[widget.currentscale][widget.tonalhighlight + 4]) % 12
+    [(_root + scales[_currentscale][_tonalhighlight]) % 12,
+    (_root + scales[_currentscale][_tonalhighlight + 2]) % 12,
+    (_root + scales[_currentscale][_tonalhighlight + 4]) % 12
     ];
   }
+  List<int> _buildchordnoteslist(int _root, int _currentchord){
+    List<int> _chordnotes = [];
+    for (int u = 0; u < chords[_currentchord].length; u++){
+      _chordnotes.add((_root + chords[_currentchord][u]) % 12);
+    }
+    return _chordnotes;
+  }
+
 
   @override
   void initState() {
     setState(() {
-      rootindex = scales[widget.currentscale].indexOf(widget.rootnote%12);
-      newScale = (widget.rootnote != -1) ? _buildnewscale(widget.rootnote): List<int>.generate(11, (i) => i + 1) ;
-      (widget.rootnote != -1) ? noteshighlighted = _buildhighlights():[];
+      if (widget.rootnote == -1){
+        showall = true;
+      }
+      else if (widget.currentscale != -1){
+        showall= false;
+        rootindex = scales[widget.currentscale].indexOf(widget.rootnote%12);
+        scalenotes = _buildscalenoteslist(widget.rootnote, widget.currentscale);
+        chordnotes = _buildhighlights(widget.rootnote, widget.currentscale, widget.tonalhighlight);
+      }
+      else if (widget.currentchord != -1)  {
+        showall= false;
+        chordnotes = _buildchordnoteslist(widget.rootnote, widget.currentchord);
+        scalenotes = chordnotes;
+      }
+      else{showall = true;}
     });
     setState(() {
       loaded = true;
@@ -69,9 +92,27 @@ class _guitarWidgetState extends State<guitarWidget> {
 
   @override
   void didUpdateWidget(guitarWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
     setState(() {
-      newScale = (widget.rootnote != -1) ? _buildnewscale(widget.rootnote): List<int>.generate(11, (i) => i + 1) ;
-      (widget.rootnote != -1) ? noteshighlighted = _buildhighlights():[];
+      loaded = false;
+      if (widget.rootnote == -1){
+        showall = true;
+      }
+      else if (widget.currentscale != -1){
+        showall= false;
+        rootindex = scales[widget.currentscale].indexOf(widget.rootnote%12);
+        scalenotes = _buildscalenoteslist(widget.rootnote, widget.currentscale);
+        chordnotes = _buildhighlights(widget.rootnote, widget.currentscale, widget.tonalhighlight);
+      }
+      else if (widget.currentchord != -1)  {
+        showall= false;
+        chordnotes = _buildchordnoteslist(widget.rootnote, widget.currentchord);
+        scalenotes = chordnotes;
+      }
+      else{showall = true;}
+    });
+    setState(() {
+      loaded = true;
     });
   }
 
@@ -83,8 +124,6 @@ class _guitarWidgetState extends State<guitarWidget> {
     }
     return frets;
   }
-
-
   void onPressed(int note, int string) {
     print(" note is ${notenames[note % 12]} on the ${string + 1} string");
   }
@@ -122,45 +161,40 @@ class _guitarWidgetState extends State<guitarWidget> {
     for (int string = 0; string < 6; ++string) { // High e to low e
       // for (int string = 5; string>=0; --string) {
       int note = tunings[tuning][string] + fretnum;
-      (widget.notesShown[note % 12] && widget.octavesShown[(note / 12).floor()])
+      showall ?
+      notes.add(noteWidget(note, string, fretwidth, true, false, null))
+          :
+      notes.add(noteWidget(
+          note, string, fretwidth, scalenotes.contains(note % 12),
+          chordnotes.contains(note % 12),(scalenotes.contains(note%12)) ? scalenotes.indexOf(note%12) : null))
 
-          ?
-    notes.add(noteWidget(note, string, fretwidth,
-          noteshighlighted.isEmpty ? false : noteshighlighted.contains(
-              note % 12)))
-
-          : notes.add(Container(height: fretwidth * (2 / 3) /*45.0*/,
-        child: Divider(height: fretwidth * (2 / 3), color: Colors.black,),));
+      ;
     }
     return notes;
   }
 
-  Widget noteWidget(int notenum, int string, double fretwidth, bool highlight) {
-    int val = (newScale.contains(notenum%12)) ? newScale.indexOf(notenum%12) : null;
+  Widget noteWidget(int note, int string, double fretwidth, bool inscale, bool inchord, int scalepos) {
+    //int val = (newScale.contains(note%12)) ? newScale.indexOf(note%12) : null;
     return GestureDetector(
-      onTap: () => onPressed(notenum, string),
+      onTap: () => onPressed(note, string),
       child: Stack(
           children: <Widget>[
             Center(
               child: Divider(height: fretwidth * (2 / 3), color: Colors.black,),
             ),
-           /* (newScale.contains(notenum%12)) ? Container(
-              width: fretwidth*(newScale.indexOf(notenum%12))/7,
-              height: fretwidth*(2 / 3)*(7- newScale.indexOf(notenum%12))/7,
-              color: Colors.green,
-            ): Container(),*/
+           inscale ?
             Padding(
               padding: const EdgeInsets.only(top: 5.0),
               child: Opacity(
-                opacity: highlight ? 0.9 : 0.6,
+                opacity: inchord ? 0.9 : 0.6,
                 child: Center(
                   child: Container(
-                    width: highlight ? 36.0 - fretsshown : 32.0 - fretsshown,
-                    height: highlight ? 36.0 - fretsshown : 32.0 - fretsshown,
+                    width: inchord ? 36.0 - fretsshown : 32.0 - fretsshown,
+                    height: inchord ? 36.0 - fretsshown : 32.0 - fretsshown,
                     decoration: BoxDecoration(
-                      color: getColor((notenum % 12).toDouble()),
+                      color: getColor((note % 12).toDouble()),
                       shape: BoxShape.circle,
-                      border: highlight ? new Border.all(
+                      border: inchord ? new Border.all(
                         color: Colors.white,
                         width: 2.5,
                       ) : Border(),
@@ -168,10 +202,10 @@ class _guitarWidgetState extends State<guitarWidget> {
 
                     child: Center(child: RichText(
                       text: TextSpan(
-                        text: "${val ?? ""} ${notenames[notenum % 12]}",
+                        text: "${scalepos ?? ""} ${notenames[note % 12]}",
                         style: TextStyle(fontSize: 12.0,
-                            color: highlight ? Colors.black : Colors.white,
-                            fontStyle: highlight ? FontStyle.normal : FontStyle
+                            color: inchord ? Colors.black : Colors.white,
+                            fontStyle: inchord ? FontStyle.normal : FontStyle
                                 .normal),
                       ), // TextSpan
                     ), // Rich Text
@@ -179,7 +213,7 @@ class _guitarWidgetState extends State<guitarWidget> {
                   ),
                 ),
               ), // Container
-            ), // Padding
+            ): Container(), // Padding
 
           ]
       ),

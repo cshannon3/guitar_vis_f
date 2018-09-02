@@ -8,11 +8,9 @@ import 'package:guitar_vis_f/shared_info.dart';
 
 
 class InputOptions extends StatefulWidget {
-  final int rootnote;
-  final Function(int rootnote, List<bool> notesShown, int tonalhighlight, int _scale) onPressed;
+  final Function(int rootnote, int currentchord,/*List<bool> notesShown,*/ int tonalhighlight, int _scale) onPressed;
 
   InputOptions({
-    this.rootnote,
     this.onPressed
 });
   @override
@@ -24,44 +22,46 @@ class _InputOptionsState extends State<InputOptions> {
   List<String> _scales = <String>[
     '', 'Major', 'Minor', 'Harmonic', 'Melodic', "Blues"];
   String _scale = '';
-  int currentscale = 0;
+  int currentscale = -1;
   int rootnote = 4;
   int tonalhighlight = 0;
   List<String> _chords = <String>[
     '', 'Major', 'Minor', '7', 'Major 7', 'sus2', 'sus4', 'dim'
   ];
   String _chord = "";
-  int currentchord = 0;
-  List<bool> notesShown = [
+  int currentchord = -1;
+  /*List<bool> notesShown = [
     true, true, true, true, true, true, true, true, true, true, true, true];
-
+*/
 
   void onScalePressed(int scale, int note) {
-    for (int m = 0; m < notesShown.length; m++) {
+    /*for (int m = 0; m < notesShown.length; m++) {
       int c = (m - note < 0) ? 12 + (m - note) : m - note;
       if (scales[scale].contains(c)) {
         notesShown[m] = true;
       } else {
         notesShown[m] = false;
       }
-    }
+    }*/
+    currentchord = -1;
+    currentscale = scale;
     setState(() {
       print(scale);
-      widget.onPressed(rootnote, notesShown, tonalhighlight, scale);
+      widget.onPressed(rootnote, currentchord,/*notesShown,*/ tonalhighlight, scale);
     });
   }
 
   void onChordPressed(int chord, int note) {
-    for (int m = 0; m < notesShown.length; m++) {
+    /*for (int m = 0; m < notesShown.length; m++) {
       int c = (m - note < 0) ? 12 + (m - note) : m - note;
       if (chords[chord].contains(c)) {
         notesShown[m] = true;
       } else {
         notesShown[m] = false;
       }
-    }
+    }*/
     setState(() {
-      widget.onPressed(rootnote, notesShown, tonalhighlight, currentscale);
+      widget.onPressed(rootnote, currentchord,/*notesShown,*/ tonalhighlight, currentscale);
     });
   }
 
@@ -69,7 +69,7 @@ class _InputOptionsState extends State<InputOptions> {
   void onPressed(int _tonalhighlight) {
     tonalhighlight = _tonalhighlight;
     setState(() {
-      widget.onPressed(rootnote, notesShown, tonalhighlight, currentscale);
+      widget.onPressed(rootnote, currentchord,/*, notesShown*/ tonalhighlight, currentscale);
     });
   }
 
@@ -81,13 +81,16 @@ class _InputOptionsState extends State<InputOptions> {
   }
 
   void showAll() {
-    for (int m = 0; m < notesShown.length; m++) {
+   /* for (int m = 0; m < notesShown.length; m++) {
       notesShown[m] = true;
-    }
+    }*/
     _scale = '';
+    rootnote = -1;
+    currentscale = -1;
+    currentchord = -1;
 
     setState(() {
-      widget.onPressed(rootnote, notesShown, tonalhighlight, currentscale);
+      widget.onPressed(rootnote/*, notesShown,*/, currentchord, tonalhighlight, currentscale);
     });
   }
 

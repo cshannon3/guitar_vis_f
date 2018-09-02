@@ -2,8 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:guitar_vis_f/Component/input_options.dart';
-import 'package:guitar_vis_f/Component/guitar_widget.dart';
+import 'package:guitar_vis_f/Component/guitar/guitar_widget.dart';
 import 'package:guitar_vis_f/Component/piano_widget.dart';
+import 'Component/instrument_widget.dart';
 
 
 
@@ -21,42 +22,47 @@ class homeScreen extends StatefulWidget {
 
 class _homeScreenState extends State<homeScreen> {
 
-  Widget guitarwidget, pianowidget;
-  List<bool> notesShown = [true,true,true,true,true,true,true,true,true,true,true,true];
-
-  int currentscale = 0;
-  int rootnote = 4;
+  Widget instrumentwidget;//, guitarwidget, pianowidget;
+  //List<bool> notesShown = [true,true,true,true,true,true,true,true,true,true,true,true];
+/*
+  int currentscale = -1;
+  int rootnote = -1;
   int currentchord = 0;
   bool guitarOn = true;
   int tonalhighlight = 0;
-
+*/
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      guitarwidget = guitarWidget(rootnote: rootnote,);
-      pianowidget = pianoWidget();
+      instrumentwidget = instrumentWidget();
+    //  guitarwidget = guitarWidget();
+    //  pianowidget = pianoWidget();
     });
   }
 
-  void onInputChanged(int _rootnote, List<bool> _notesShown, int _tonalhighlight, int _currentscale) {
+  void onInputChanged(int _rootnote,int _currentchord /*List<bool> _notesShown*/, int _tonalhighlight, int _currentscale) {
 
     setState(() {
-      notesShown = _notesShown;
-      rootnote = _rootnote;
+      //notesShown = _notesShown;
+     /* rootnote = _rootnote;
       tonalhighlight = _tonalhighlight;
       currentscale = _currentscale;
-      guitarwidget = guitarWidget(
-          notesShown: notesShown,
-          rootnote:  rootnote,
+      currentchord = _currentchord;*/
+      instrumentwidget = instrumentWidget(
+          //notesShown: notesShown,
+        currentchord: _currentchord,
+          rootnote:  _rootnote,
           tonalhighlight: _tonalhighlight,
-          currentscale: currentscale,);
-      pianowidget = pianoWidget(
-          notesShown: notesShown,
-          rootnote:  rootnote,
+          currentscale: _currentscale,
+          );
+     /* pianowidget = pianoWidget(
+         // notesShown: notesShown,
+        currentchord: _currentchord,
+          rootnote:  _rootnote,
           tonalhighlight: _tonalhighlight,
-          currentscale: currentscale,);
+          currentscale: _currentscale,);*/
     });
 
   }
@@ -65,10 +71,16 @@ class _homeScreenState extends State<homeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body:
-      Stack(
+      Column(
         children: <Widget>[
-          InputOptions(rootnote: rootnote, onPressed: onInputChanged,),
-          Align(
+          Expanded(
+        child:
+          InputOptions(onPressed: onInputChanged,),
+    ),
+          Expanded(
+            child: instrumentwidget,
+          ),
+          /*Align(
             alignment: Alignment.bottomCenter,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -77,20 +89,20 @@ class _homeScreenState extends State<homeScreen> {
                     icon: Icon(Icons.print),
                   onPressed: () {
                       setState(() {
-                        guitarOn = !guitarOn;
+                        //guitarOn = !guitarOn;
                       });
                   },
                 ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 50.0),
-                  child:  guitarOn ? guitarwidget : pianowidget,
-                ),
+                  child:  /*guitarOn ?*/instrumentwidget /*: pianowidget*/,
+                ),*/
               ],
             ),
-          ), // Center
+        //  ), // Center
 
-        ],
-      ), // Padding
+       // ],
+     // ), // Padding
     ); //Material App
   }
 }
