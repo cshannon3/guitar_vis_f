@@ -180,52 +180,77 @@ class _guitarWidgetState extends State<instrumentWidget> {
     return notes;
   }
 
-  /*Widget noteWidget(int note, int string, double fretwidth, bool inscale, bool inchord, int scalepos) {
-    //int val = (newScale.contains(note%12)) ? newScale.indexOf(note%12) : null;
-    return GestureDetector(
-      onTap: () => onPressed(note, string),
-      child: Stack(
-          children: <Widget>[
-            Center(
-              child: Divider(height: fretwidth * (2 / 3), color: Colors.black,),
-            ),
-            inscale ?
-            Padding(
-              padding: const EdgeInsets.only(top: 5.0),
-              child: Opacity(
-                opacity: inchord ? 0.9 : 0.6,
-                child: Center(
-                  child: Container(
-                    width: inchord ? 36.0 - fretsshown : 32.0 - fretsshown,
-                    height: inchord ? 36.0 - fretsshown : 32.0 - fretsshown,
-                    decoration: BoxDecoration(
-                      color: getColor((note % 12).toDouble()),
-                      shape: BoxShape.circle,
-                      border: inchord ? new Border.all(
-                        color: Colors.white,
-                        width: 2.5,
-                      ) : Border(),
-                    ), // Box Decoration
-
-                    child: Center(child: RichText(
-                      text: TextSpan(
-                        text: "${scalepos ?? ""} ${notenames[note % 12]}",
-                        style: TextStyle(fontSize: 12.0,
-                            color: inchord ? Colors.black : Colors.white,
-                            fontStyle: inchord ? FontStyle.normal : FontStyle
-                                .normal),
-                      ), // TextSpan
-                    ), // Rich Text
-                    ), // Center
-                  ),
-                ),
-              ), // Container
-            ): Container(), // Padding
-
-          ]
-      ),
-    ); //Stack
+  List<Widget> _buildKeys() {
+    List<Widget> keys = [];
+    for (int p = 0; p< 36; ++p) {
+      keys.add(_buildKey(p));
+    }
+    return keys;
+    // 49 C#/ 51 D#/ 54 F#/ 56 G#/ 58 A#/ //61 / 63/ 66/ 68/ 70
+  }
+  /* _playNote(int keyname) async {
+    await Flame.audio.play("piano_${keyname}.mp3");
   }*/
+  Widget _buildKey(int keyname) {
+    return Padding(
+      padding: EdgeInsets.only( bottom: (sharps.contains(keyname%12)) ? 20.0: 1.0),
+      child: new Container(
+        width: 40.0,
+        //color: (keyname.contains("sharp")) ? Colors.black : Colors.white10,
+        decoration: BoxDecoration(
+
+          color: (sharps.contains(keyname%12)) ? Colors.black : Colors.white,
+          border: Border(
+            left: BorderSide(color: Colors.grey, width: 1.0),
+            right: BorderSide(color: Colors.grey, width: 1.0),
+            bottom: BorderSide(color: Colors.white24, width: 1.0),
+          ),
+
+        ),
+
+        child: !showall ? (scalenotes.contains(keyname%12)) ? Container(
+          color: chordnotes.contains(keyname%12) ?
+          getColor((keyname%12).toDouble()).withOpacity(0.5): (sharps.contains(keyname%12)) ? Colors.black : Colors.white,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: noteWidget2(keyname, chordnotes.contains(keyname%12)),
+          ),
+        ): Container(): Container(),
+      ),
+    );
+  }
+  Widget noteWidget2(int notenum, bool highlight) {
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        width: highlight ? 40.0:30.0,
+        height: highlight ? 40.0:30.0,
+
+        decoration: BoxDecoration(
+          color: getColor((notenum%12).toDouble()),
+          shape: BoxShape.circle,
+          border: highlight ? new Border.all(
+            color: (sharps.contains(notenum%12)) ? Colors.white : Colors.black,
+            width: 2.5,
+          ) : Border(),
+
+        ), // Box Decoration
+
+        child: Center(child: RichText(
+          text: TextSpan(
+            text: notenames[notenum%12],
+            style: TextStyle(fontSize: 12.0, color: highlight ?Colors.black: Colors.white, fontStyle: highlight ?FontStyle.normal : FontStyle.normal),
+          ), // TextSpan
+        ), // Rich Text
+        ), // Center
+      ),  // Container
+    );  //Stack
+  }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -239,12 +264,20 @@ class _guitarWidgetState extends State<instrumentWidget> {
         Container(
           height: 40.0,
           color: Colors.blue,
+          child: IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () {
+                setState(() {
+                  guitaron = !guitaron;
+                });
+              }
+          ),
         ),
         Container(
       height: 300.0,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        children: loaded ? _buildFrets(screen_width) : [],
+        children: guitaron ? _buildFrets(screen_width) : _buildKeys(),
       ),
         ),
         Expanded(child: Container(),)
