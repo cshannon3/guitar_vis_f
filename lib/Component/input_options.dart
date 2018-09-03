@@ -30,19 +30,10 @@ class _InputOptionsState extends State<InputOptions> {
   ];
   String _chord = "";
   int currentchord = -1;
-  /*List<bool> notesShown = [
-    true, true, true, true, true, true, true, true, true, true, true, true];
-*/
+
 
   void onScalePressed(int scale, int note) {
-    /*for (int m = 0; m < notesShown.length; m++) {
-      int c = (m - note < 0) ? 12 + (m - note) : m - note;
-      if (scales[scale].contains(c)) {
-        notesShown[m] = true;
-      } else {
-        notesShown[m] = false;
-      }
-    }*/
+
     currentchord = -1;
     currentscale = scale;
     setState(() {
@@ -52,14 +43,7 @@ class _InputOptionsState extends State<InputOptions> {
   }
 
   void onChordPressed(int chord, int note) {
-    /*for (int m = 0; m < notesShown.length; m++) {
-      int c = (m - note < 0) ? 12 + (m - note) : m - note;
-      if (chords[chord].contains(c)) {
-        notesShown[m] = true;
-      } else {
-        notesShown[m] = false;
-      }
-    }*/
+
     setState(() {
       widget.onPressed(rootnote, currentchord,/*notesShown,*/ tonalhighlight, currentscale);
     });

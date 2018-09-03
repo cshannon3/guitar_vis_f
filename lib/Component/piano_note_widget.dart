@@ -5,13 +5,16 @@ class pianoKeyWidget extends StatelessWidget {
   final int note;
   final bool inscale;
   final bool inchord;
+  final int keysshown;
 
   pianoKeyWidget({
     Key key,
     this.note,
     this.inscale,
-    this.inchord
+    this.inchord,
+    this.keysshown,
   }) : super(key: key);
+
   Widget noteWidget(int notenum, bool highlight) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -30,14 +33,16 @@ class pianoKeyWidget extends StatelessWidget {
 
         ), // Box Decoration
 
-        child: Center(child: RichText(
-          text: TextSpan(
-            text: notenames[notenum % 12],
-            style: TextStyle(fontSize: 12.0,
-                color: highlight ? Colors.black : Colors.white,
-                fontStyle: highlight ? FontStyle.normal : FontStyle.normal),
-          ), // TextSpan
-        ), // Rich Text
+        child: OverflowBox(
+          child: Center(child: RichText(
+            text: TextSpan(
+              text: notenames[notenum % 12],
+              style: TextStyle(fontSize: 12.0,
+                  color: highlight ? Colors.black : Colors.white,
+                  fontStyle: highlight ? FontStyle.normal : FontStyle.normal),
+            ), // TextSpan
+          ), // Rich Text
+          ),
         ), // Center
       ), // Container
     ); //Stack

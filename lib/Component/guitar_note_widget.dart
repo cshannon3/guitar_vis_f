@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guitar_vis_f/shared_info.dart';
-class noteWidget extends StatelessWidget {
+class guitarNoteWidget extends StatelessWidget {
   final int note;
   final int string;
   final double fretwidth;
@@ -9,7 +9,7 @@ class noteWidget extends StatelessWidget {
   final int fretsshown;
   final int scalepos;
 
-  noteWidget({Key key,
+  guitarNoteWidget({Key key,
     this.note,
     this.string,
     this.fretwidth,
@@ -46,15 +46,20 @@ class noteWidget extends StatelessWidget {
                       ) : Border(),
                     ), // Box Decoration
 
-                    child: Center(child: RichText(
-                      text: TextSpan(
-                        text: "${scalepos ?? ""} ${notenames[note % 12]}",
-                        style: TextStyle(fontSize: 12.0,
-                            color: inchord ? Colors.black : Colors.white,
-                            fontStyle: inchord ? FontStyle.normal : FontStyle
-                                .normal),
-                      ), // TextSpan
-                    ), // Rich Text
+                    child: OverflowBox(
+                      maxWidth: 30.0,
+                      minWidth: 20.0,
+                      child: Center(child:
+                      RichText(
+                        text: TextSpan(
+                          text: "${scalepos ?? ""} ${notenames[note % 12]}",
+                          style: TextStyle(fontSize: 12.0,
+                              color: inchord ? Colors.black : Colors.white,
+                              fontStyle: inchord ? FontStyle.normal : FontStyle
+                                  .normal),
+                        ), // TextSpan
+                      ), // Rich Text
+                      ),
                     ), // Center
                   ),
                 ),
