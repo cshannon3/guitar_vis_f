@@ -115,7 +115,6 @@ class _guitarWidgetState extends State<instrumentWidget> {
   Widget _buildFret(int fretnum, double fretwidth) {
     return new Container(
         width: fretwidth,
-        //color: (keyname.contains("sharp")) ? Colors.black : Colors.white10,
         decoration: BoxDecoration(
           color: Colors.brown[300],
           border: Border(
@@ -124,12 +123,10 @@ class _guitarWidgetState extends State<instrumentWidget> {
             bottom: BorderSide(color: Colors.white24, width: 1.0),
           ),
         ),
-        padding: EdgeInsets.all(1.0),
         child: Column(
             children: _buildNotes(fretnum, widget.tuning, fretwidth)
               ..add(
-                  Align(
-                    alignment: Alignment.bottomCenter,
+                  Expanded(child: Center(
                       child: RichText(
                     text: TextSpan(
                       text: "$fretnum",
@@ -138,7 +135,8 @@ class _guitarWidgetState extends State<instrumentWidget> {
                           fontStyle: FontStyle.normal),
                     ), // TextSpan
                   ), // Rich Text))
-                  )
+                  ),
+                  ),
               )));
   }
 
@@ -163,14 +161,15 @@ class _guitarWidgetState extends State<instrumentWidget> {
     return notes;
   }
 
-  List<Widget> _buildKeys() {
+  List<Widget> _buildKeys(double _screenwidth) {
+    double keywidth = _screenwidth / keysshown;
     List<Widget> keys = [];
     for (int note = 0; note < 36; ++note) {
       keys.add(pianoKeyWidget(
           note: note%12,
           inscale: showall ? true : scalenotes.contains(note % 12),
           inchord: showall ? false : chordnotes.contains(note % 12),
-          keysshown: keysshown,
+          keywidth: keywidth,
       )
       );
     }
@@ -207,6 +206,8 @@ class _guitarWidgetState extends State<instrumentWidget> {
                   min: 6.0,
                   max: 12.0,
                   divisions: 7,
+                  label: '${fretsshown.round()}',
+                  activeColor: Colors.white,
                   onChanged: (double newValue) {
                     setState(() {
                       fretsshown = newValue.floor();
@@ -218,6 +219,8 @@ class _guitarWidgetState extends State<instrumentWidget> {
                   min: 10.0,
                   max: 24.0,
                   divisions: 15,
+                  label: '${keysshown.round()}',
+                  activeColor: Colors.white,
                   onChanged: (double newValue) {
                     setState(() {
                       keysshown = newValue.floor();
@@ -229,10 +232,11 @@ class _guitarWidgetState extends State<instrumentWidget> {
           ),
         ),
         Container(
-          height: 390.0 - fretsshown*15.0,
+          height: guitaron ? 300.0 - (fretsshown-6)*20.0: 300.0-keysshown*10.0,
+          color: Colors.white,
           child: ListView(
             scrollDirection: Axis.horizontal,
-            children: guitaron ? _buildFrets(screen_width) : _buildKeys(),
+            children: guitaron ? _buildFrets(screen_width) : _buildKeys(screen_width),
           ),
         ),
         Expanded(child: Container(),)
