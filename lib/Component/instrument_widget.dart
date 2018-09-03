@@ -183,7 +183,6 @@ class _guitarWidgetState extends State<instrumentWidget> {
         .of(context)
         .size
         .width;
-    print(screen_width);
     return new Column(
       children: <Widget>[
         Container(

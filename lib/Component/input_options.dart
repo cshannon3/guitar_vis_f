@@ -8,7 +8,7 @@ import 'package:guitar_vis_f/shared_info.dart';
 
 
 class InputOptions extends StatefulWidget {
-  final Function(int rootnote, int currentchord,/*List<bool> notesShown,*/ int tonalhighlight, int _scale) onPressed;
+  final Function(int rootnote, int currentchord, int tonalhighlight, int _scale) onPressed;
 
   InputOptions({
     this.onPressed
@@ -32,42 +32,13 @@ class _InputOptionsState extends State<InputOptions> {
   int currentchord = -1;
 
 
-  void onScalePressed(int scale, int note) {
-
-    currentchord = -1;
-    currentscale = scale;
+  void onChanged() {
     setState(() {
-      print(scale);
-      widget.onPressed(rootnote, currentchord,/*notesShown,*/ tonalhighlight, scale);
+      widget.onPressed(rootnote, currentchord,tonalhighlight, currentscale);
     });
-  }
-
-  void onChordPressed(int chord, int note) {
-
-    setState(() {
-      widget.onPressed(rootnote, currentchord,/*notesShown,*/ tonalhighlight, currentscale);
-    });
-  }
-
-
-  void onPressed(int _tonalhighlight) {
-    tonalhighlight = _tonalhighlight;
-    setState(() {
-      widget.onPressed(rootnote, currentchord,/*, notesShown*/ tonalhighlight, currentscale);
-    });
-  }
-
-  void onNoteSelected(int _rootnote) {
-    rootnote = _rootnote;
-    _scale != '' ?
-    onScalePressed(currentscale, rootnote)
-        : onChordPressed(currentchord, rootnote);
   }
 
   void showAll() {
-   /* for (int m = 0; m < notesShown.length; m++) {
-      notesShown[m] = true;
-    }*/
     _scale = '';
     rootnote = -1;
     currentscale = -1;
@@ -80,12 +51,14 @@ class _InputOptionsState extends State<InputOptions> {
 
   @override
   Widget build(BuildContext context) {
+
     return new Stack(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 8.0, vertical: 50.0),
+            padding: EdgeInsets.only(
+                left: 8.0,right: 8.0,  top: 50.0, bottom: _scale!=-1 ? 200.0: 0.0),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 _chord == '' ? new InputDecorator(
                   decoration: const InputDecoration(
@@ -99,11 +72,10 @@ class _InputOptionsState extends State<InputOptions> {
                       isDense: true,
                       onChanged: (String newValue) {
                         setState(() {
-                          // newContact.favoriteColor = newValue;
                           _scale = newValue;
                           currentscale = _scales.indexOf(_scale) - 1;
                           if (currentscale >= 0) {
-                            onScalePressed(currentscale, rootnote);
+                            onChanged();
                           } else {
                             showAll();
                           }
@@ -130,11 +102,11 @@ class _InputOptionsState extends State<InputOptions> {
                       isDense: true,
                       onChanged: (String newValue) {
                         setState(() {
-                          // newContact.favoriteColor = newValue;
                           _chord = newValue;
                           currentchord = _chords.indexOf(_chord) - 1;
                           if (currentchord >= 0) {
-                            onChordPressed(currentchord, rootnote);
+
+                            onChanged();
                           } else {
                             showAll();
                           }
@@ -152,15 +124,29 @@ class _InputOptionsState extends State<InputOptions> {
                 _scale != '' || _chord != '' ?
                   InfiniteList(
                     rootnote: rootnote,
-                    onPressed: onNoteSelected,
+                    onPressed: (int _rootnote){
+                      setState(() {
+                        rootnote = _rootnote;
+                        onChanged();
+                      });
+                    }
+
                   ) : Container(),
               ],
             ),
           ), // Expanded
-          _scale != '' ? RadialMenu(
-            anchor: Offset(200.0, 350.0),
-            onPressed: onPressed,
-            rootnote: rootnote,
+          _scale != '' ? Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: RadialMenu(
+              anchor: Offset(200.0, 350.0),
+              rootnote: rootnote,
+              onPressed: (int _tonalhighlight) {
+                setState(() {
+                  tonalhighlight = _tonalhighlight;
+                  onChanged();
+                });
+              }
+            ),
           ) : Container(),
         ]
     );

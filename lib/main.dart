@@ -11,6 +11,7 @@ void main() => runApp(//new game_screen());//TestApp());
       title: "Music App",
       theme: new ThemeData.dark(),
       home: new homeScreen(),
+      debugShowCheckedModeBanner: false,
     ));
 
 class homeScreen extends StatefulWidget {

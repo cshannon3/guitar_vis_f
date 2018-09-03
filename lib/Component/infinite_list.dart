@@ -61,34 +61,40 @@ class _InfiniteListState extends State<InfiniteList> {
   }
 
   Widget _buildNoteButton(int note, bool isSelected){
-    return Container(
-        height: 40.0,
-        width: 50.0,
-        decoration: BoxDecoration(
-          border: isSelected ? Border(
-            left: BorderSide(color: Colors.grey, width: 2.0),
-            right: BorderSide(color: Colors.grey, width: 2.0),
-            bottom: BorderSide(color: Colors.white24, width: 2.0),
-            top: BorderSide(color: Colors.white24, width: 2.0),
-          ): Border(), // Border
-        ),
-        child: RaisedButton(
-          onPressed: (){
-            setState(() {
-              rootnote = note;
-              widget.onPressed(rootnote);
-              loadingnotes =true;
-              noteButtons = _buildNoteButtons();
-            });
-            setState(() {
-              loadingnotes = false;
-            });
-          },
-          child: RichText(
-              text: TextSpan(
-                  text: notenames[note])
+    return GestureDetector(
+      onTap: (){
+        setState(() {
+          rootnote = note;
+          widget.onPressed(rootnote);
+          loadingnotes =true;
+          noteButtons = _buildNoteButtons();
+        });
+        setState(() {
+          loadingnotes = false;
+        });
+      },
+      child: Container(
+          height: 40.0,
+          width: 50.0,
+          decoration: BoxDecoration(
+            color: getColor((note % 12).toDouble()),
+            shape: BoxShape.circle,
+            border: isSelected ? new Border.all(
+              color: (sharps.contains(note % 12)) ? Colors.white : Colors
+                  .black,
+              width: 2.5,
+            ) : Border(),
+
           ),
-        )
+
+            child: Center(
+              child: RichText(
+                  text: TextSpan(
+                      text: notenames[note])
+              ),
+            ),
+          )
+      //),
     );
   }
 
@@ -104,7 +110,9 @@ class _InfiniteListState extends State<InfiniteList> {
         ),
         Expanded(child: Container(
           height: 50.0,
+
           decoration: BoxDecoration(
+            color: Colors.grey[600],
             border: Border(
               left: BorderSide(color: Colors.grey, width: 1.0),
               right: BorderSide(color: Colors.grey, width: 1.0),
