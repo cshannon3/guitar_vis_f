@@ -14,7 +14,7 @@ class instrumentWidget extends StatefulWidget {
 
 
   instrumentWidget({
-    this.tuning = 0,
+    this.tuning = 2,
     this.rootnote = -1,
     this.tonalhighlight =0,
     this.currentscale = -1,
@@ -23,10 +23,10 @@ class instrumentWidget extends StatefulWidget {
   });
 
   @override
-  _guitarWidgetState createState() => new _guitarWidgetState();
+  _instrumentWidgetState createState() => new _instrumentWidgetState();
 }
 
-class _guitarWidgetState extends State<instrumentWidget> {
+class _instrumentWidgetState extends State<instrumentWidget> {
 
 
   int fretsshown = 6;
@@ -36,6 +36,7 @@ class _guitarWidgetState extends State<instrumentWidget> {
   List<int> chordnotes = [];
   bool showall = true;
   bool guitaron = true;
+  List<int> currenttuning = [4, 9, 14, 19, 23, 28];
 
   @override
   void initState() {
