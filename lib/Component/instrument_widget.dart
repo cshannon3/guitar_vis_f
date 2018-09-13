@@ -14,7 +14,7 @@ class instrumentWidget extends StatefulWidget {
 
 
   instrumentWidget({
-    this.tuning = 2,
+    this.tuning = 0,
     this.rootnote = -1,
     this.tonalhighlight =0,
     this.currentscale = -1,
@@ -36,17 +36,25 @@ class _instrumentWidgetState extends State<instrumentWidget> {
   List<int> chordnotes = [];
   bool showall = true;
   bool guitaron = true;
-  List<int> currenttuning = [4, 9, 14, 19, 23, 28];
+  int currenttuning;
+
+  List<String> _tunings = <String>[
+    'EADGBe', 'DADGBe', 'DADGBd', 'DGDGBD',
+  ];
+  String _tuning;
 
   @override
   void initState() {
     super.initState();
+    currenttuning = widget.tuning;
+    _tuning = _tunings[currenttuning];
     _updateValues();
   }
 
 
   @override
   void didUpdateWidget(instrumentWidget oldWidget) {
+    print(currenttuning);
     super.didUpdateWidget(oldWidget);
     _updateValues();
   }
@@ -60,15 +68,17 @@ class _instrumentWidgetState extends State<instrumentWidget> {
     return scale;
   }
 
-  List<int> _buildhighlights(int _root, int _currentscale, int _tonalhighlight) {
+  List<int> _buildhighlights(int _root, int _currentscale,
+      int _tonalhighlight) {
     List<int> _highlightnotes = [];
-    for (int u = 0; u < 6; u+=2) {
-      _highlightnotes.add((_root + scales[_currentscale][_tonalhighlight+u]) % 12);
+    for (int u = 0; u < 6; u += 2) {
+      _highlightnotes.add(
+          (_root + scales[_currentscale][_tonalhighlight + u]) % 12);
     }
 
     return _highlightnotes;
+  }
 
-}
   List<int> _buildchordnoteslist(int _root, int _currentchord) {
     List<int> _chordnotes = [];
     for (int u = 0; u < chords[_currentchord].length; u++) {
@@ -98,10 +108,7 @@ class _instrumentWidgetState extends State<instrumentWidget> {
         showall = true;
       }
     });
-
   }
-
-
 
 
   List<Widget> _buildFrets(double _screenwidth) {
@@ -125,10 +132,10 @@ class _instrumentWidgetState extends State<instrumentWidget> {
           ),
         ),
         child: Column(
-            children: _buildNotes(fretnum, widget.tuning, fretwidth)
+            children: _buildNotes(fretnum, /*currenttuning,*/ fretwidth)
               ..add(
-                  Expanded(child: Center(
-                      child: RichText(
+                Expanded(child: Center(
+                  child: RichText(
                     text: TextSpan(
                       text: "$fretnum",
                       style: TextStyle(fontSize: 10.0,
@@ -136,28 +143,29 @@ class _instrumentWidgetState extends State<instrumentWidget> {
                           fontStyle: FontStyle.normal),
                     ), // TextSpan
                   ), // Rich Text))
-                  ),
-                  ),
+                ),
+                ),
               )));
   }
 
-  List<Widget> _buildNotes(int fretnum, int tuning, double fretwidth) {
+  List<Widget> _buildNotes(int fretnum, /*int tuning,*/ double fretwidth) {
     List<Widget> notes = [];
     for (int string = 0; string < 6; ++string) { // High e to low e
       // for (int string = 5; string>=0; --string) {
-      int note = tunings[tuning][string] + fretnum;
+      int note = tunings[currenttuning][string] + fretnum;
       notes.add(
-          guitarNoteWidget(
-              note: note,
-              string: string,
-              fretwidth: fretwidth,
-              inscale: showall ? true : scalenotes.contains(note % 12),
-              inchord: showall ? false : chordnotes.contains(note % 12),
-              fretsshown: fretsshown,
-              scalepos: (showall || !scalenotes.contains(note % 12))
-                  ? null
-                  : scalenotes.indexOf(note % 12)
-          ));
+        guitarNoteWidget(
+            note: note,
+            string: string,
+            fretwidth: fretwidth,
+            inscale: showall ? true : scalenotes.contains(note % 12),
+            inchord: showall ? false : chordnotes.contains(note % 12),
+            fretsshown: fretsshown,
+            scalepos: (showall || !scalenotes.contains(note % 12))
+                ? null
+                : scalenotes.indexOf(note % 12)
+        ),
+      );
     }
     return notes;
   }
@@ -167,16 +175,15 @@ class _instrumentWidgetState extends State<instrumentWidget> {
     List<Widget> keys = [];
     for (int note = 0; note < 36; ++note) {
       keys.add(pianoKeyWidget(
-          note: note%12,
-          inscale: showall ? true : scalenotes.contains(note % 12),
-          inchord: showall ? false : chordnotes.contains(note % 12),
-          keywidth: keywidth,
+        note: note % 12,
+        inscale: showall ? true : scalenotes.contains(note % 12),
+        inchord: showall ? false : chordnotes.contains(note % 12),
+        keywidth: keywidth,
       )
       );
     }
     return keys;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -184,22 +191,43 @@ class _instrumentWidgetState extends State<instrumentWidget> {
         .of(context)
         .size
         .width;
-    return new Column(
-      children: <Widget>[
-        Container(
-          height: 40.0,
-          width: double.infinity,
-          color: Colors.blue,
-          child: Row(
+    return /*Stack(
+
+      children: [
+*/
+      new Column(
+        children: <Widget>[
+          Container(
+            height: 45.0,
+            width: double.infinity,
+            color: Colors.blue,
+            child: Row(
               children: [
                 IconButton(
-              icon: Icon(Icons.refresh),
-              onPressed: () {
-                setState(() {
-                  guitaron = !guitaron;
-                });
-              }
-          ),
+                    icon: Icon(Icons.refresh),
+                    onPressed: () {
+                      setState(() {
+                        guitaron = !guitaron;
+                      });
+                    }
+                ),
+               guitaron ? new DropdownButton<String>(
+                 isDense: true,
+                 value: _tuning,
+                  onChanged: (tuning) {
+                    setState(() {
+                      print(tuning);
+                      _tuning = tuning;
+                      currenttuning = _tunings.indexOf(tuning);
+                    });
+                  },
+                  items: _tunings.map((String value) {
+                    return new DropdownMenuItem<String>(
+                      value: value,
+                      child: new Text(value),
+                    );
+                  }).toList(),
+                ):Container(),
                 Expanded(child: Container(),),
                 guitaron ? Slider(
                   value: fretsshown.toDouble(),
@@ -228,19 +256,21 @@ class _instrumentWidgetState extends State<instrumentWidget> {
                   },
 
                 )
-    ],
+              ],
+            ),
           ),
-        ),
-        Container(
-          height: guitaron ? 300.0 - (fretsshown-6)*20.0: 300.0-keysshown*10.0,
-          color: Colors.white,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: guitaron ? _buildFrets(screen_width) : _buildKeys(screen_width),
+          Container(
+            height: guitaron ? 300.0 - (fretsshown - 6) * 20.0 : 300.0 -
+                keysshown * 10.0,
+            color: Colors.white,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: guitaron ? _buildFrets(screen_width) : _buildKeys(
+                  screen_width),
+            ),
           ),
-        ),
-        Expanded(child: Container(),)
-      ],
-    ); // ListView;
+          Expanded(child: Container(),)
+        ],
+      );
   }
 }

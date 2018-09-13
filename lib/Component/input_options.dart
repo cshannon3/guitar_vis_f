@@ -19,15 +19,13 @@ class InputOptions extends StatefulWidget {
 
 class _InputOptionsState extends State<InputOptions> {
 
-  List<String> _scales = <String>[
-    '', 'Major', 'Minor', 'Harmonic', 'Melodic', "Blues"];
+
+
   String _scale = '';
   int currentscale = -1;
   int rootnote = 4;
   int tonalhighlight = 0;
-  List<String> _chords = <String>[
-    '', 'Major', 'Minor', '7', 'Major 7', 'sus2', 'sus4', 'dim'
-  ];
+
   String _chord = "";
   int currentchord = -1;
 
@@ -73,7 +71,7 @@ class _InputOptionsState extends State<InputOptions> {
                       onChanged: (String newValue) {
                         setState(() {
                           _scale = newValue;
-                          currentscale = _scales.indexOf(_scale) - 1;
+                          currentscale = scalenames.indexOf(_scale) - 1;
                           if (currentscale >= 0) {
                             onChanged();
                           } else {
@@ -81,7 +79,7 @@ class _InputOptionsState extends State<InputOptions> {
                           }
                         });
                       },
-                      items: _scales.map((String value) {
+                      items: scalenames.map((String value) {
                         return new DropdownMenuItem<String>(
                           value: value,
                           child: new Text(value),
@@ -103,7 +101,7 @@ class _InputOptionsState extends State<InputOptions> {
                       onChanged: (String newValue) {
                         setState(() {
                           _chord = newValue;
-                          currentchord = _chords.indexOf(_chord) - 1;
+                          currentchord = chordnames.indexOf(_chord) - 1;
                           if (currentchord >= 0) {
 
                             onChanged();
@@ -112,7 +110,7 @@ class _InputOptionsState extends State<InputOptions> {
                           }
                         });
                       },
-                      items: _chords.map((String value) {
+                      items: chordnames.map((String value) {
                         return new DropdownMenuItem<String>(
                           value: value,
                           child: new Text(value),
