@@ -8,7 +8,7 @@ import 'package:guitar_vis_f/shared_info.dart';
 
 
 class InputOptions extends StatefulWidget {
-  final Function(int rootnote, int currentchord, int tonalhighlight, int _scale) onPressed;
+  final Function(int rootnote, int currentchord, int tonalhighlight, int _scale, int currenttab) onPressed;
 
   InputOptions({
     this.onPressed
@@ -19,20 +19,21 @@ class InputOptions extends StatefulWidget {
 
 class _InputOptionsState extends State<InputOptions> {
 
-
-
   String _scale = '';
   int currentscale = -1;
   int rootnote = 4;
   int tonalhighlight = 0;
-
   String _chord = "";
   int currentchord = -1;
+  String _tab = "";
+  List<String> tabnames = ['', "Simple Man"];
+  int currenttab = -1;
+
 
 
   void onChanged() {
     setState(() {
-      widget.onPressed(rootnote, currentchord,tonalhighlight, currentscale);
+      widget.onPressed(rootnote, currentchord,tonalhighlight, currentscale, currenttab);
     });
   }
 
@@ -41,9 +42,10 @@ class _InputOptionsState extends State<InputOptions> {
     rootnote = -1;
     currentscale = -1;
     currentchord = -1;
+    currenttab = -1;
 
     setState(() {
-      widget.onPressed(rootnote/*, notesShown,*/, currentchord, tonalhighlight, currentscale);
+      widget.onPressed(rootnote, currentchord, tonalhighlight, currentscale, currenttab);
     });
   }
 
@@ -54,11 +56,11 @@ class _InputOptionsState extends State<InputOptions> {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.only(
-                left: 8.0,right: 8.0,  top: 50.0, bottom: _scale!=-1 ? 200.0: 0.0),
+                left: 8.0,right: 8.0,  top: 50.0, /*bottom: _scale!=-1 ? 100.0: 0.0*/),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+
               children: <Widget>[
-                _chord == '' ? new InputDecorator(
+                _chord == '' && _tab == '' ? new InputDecorator(
                   decoration: const InputDecoration(
                     icon: const Icon(Icons.library_music),
                     labelText: 'Scale',
@@ -88,7 +90,8 @@ class _InputOptionsState extends State<InputOptions> {
                     ), // Dropdown Button
                   ), // DropdownButtonHideUnderline
                 ) : Container(), // Input Decorator
-                _scale == '' ? new InputDecorator(
+            /*  */
+                _scale == '' && _tab == '' ? new InputDecorator(
                   decoration: const InputDecoration(
                     icon: const Icon(Icons.music_note),
                     labelText: 'Chord',
@@ -103,7 +106,6 @@ class _InputOptionsState extends State<InputOptions> {
                           _chord = newValue;
                           currentchord = chordnames.indexOf(_chord) - 1;
                           if (currentchord >= 0) {
-
                             onChanged();
                           } else {
                             showAll();
@@ -111,6 +113,37 @@ class _InputOptionsState extends State<InputOptions> {
                         });
                       },
                       items: chordnames.map((String value) {
+                        return new DropdownMenuItem<String>(
+                          value: value,
+                          child: new Text(value),
+                        );
+                      }).toList(),
+                    ), // Dropdown Button
+                  ), // DropdownButtonHideUnderline
+                ) : Container(),
+                _scale == '' && _chord == '' ? new InputDecorator(
+                  decoration: const InputDecoration(
+                    icon: const Icon(Icons.music_note),
+                    labelText: 'Tab',
+                  ),
+                  isEmpty: _tab == '',
+                  child: new DropdownButtonHideUnderline(
+                    child: new DropdownButton<String>(
+                      value: _tab,
+                      isDense: true,
+                      onChanged: (String newValue) {
+                        setState(() {
+                          _tab = newValue;
+                          if (_tab != '') {
+                            currenttab = 0;
+                            print(_tab);
+                            onChanged();
+                          } else {
+                            showAll();
+                          }
+                        });
+                      },
+                      items: tabnames.map((String value) {
                         return new DropdownMenuItem<String>(
                           value: value,
                           child: new Text(value),
@@ -132,7 +165,8 @@ class _InputOptionsState extends State<InputOptions> {
                   ) : Container(),
               ],
             ),
-          ), // Expanded
+          ),
+
           _scale != '' ? Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: RadialMenu(

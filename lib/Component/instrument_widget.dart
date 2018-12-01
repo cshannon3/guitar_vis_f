@@ -11,14 +11,16 @@ class instrumentWidget extends StatefulWidget {
   final int tonalhighlight;
   final int currentscale;
   final int currentchord;
+  final int currenttab;
 
 
   instrumentWidget({
-    this.tuning = 0,
+    this.tuning = 4,//0,
     this.rootnote = -1,
     this.tonalhighlight =0,
     this.currentscale = -1,
     this.currentchord = -1,
+    this.currenttab = -1,
 
   });
 
@@ -34,20 +36,20 @@ class _instrumentWidgetState extends State<instrumentWidget> {
   int rootindex;
   List<int> scalenotes = [];
   List<int> chordnotes = [];
+  List<List<int>> tab = [];
   bool showall = true;
   bool guitaron = true;
   int currenttuning;
+  int tabnum = 0;
 
-  List<String> _tunings = <String>[
-    'EADGBe', 'DADGBe', 'DADGBd', 'DGDGBD',
-  ];
+
   String _tuning;
 
   @override
   void initState() {
     super.initState();
     currenttuning = widget.tuning;
-    _tuning = _tunings[currenttuning];
+    _tuning = tuningnames[currenttuning];
     _updateValues();
   }
 
@@ -86,12 +88,19 @@ class _instrumentWidgetState extends State<instrumentWidget> {
     }
     return _chordnotes;
   }
+  
 
   void _updateValues() {
     setState(() {
-      if (widget.rootnote == -1) {
-        showall = true;
+      if (widget.currenttab != -1 ) {
+        showall = false;
+        tab = simpleman;
+        print(tab);
+        print(tab.length);
       }
+     /* if (widget.rootnote == -1 ) {
+        showall = true;
+      }*/
       else if (widget.currentscale != -1) {
         showall = false;
         rootindex = scales[widget.currentscale].indexOf(widget.rootnote % 12);
@@ -150,7 +159,7 @@ class _instrumentWidgetState extends State<instrumentWidget> {
 
   List<Widget> _buildNotes(int fretnum, /*int tuning,*/ double fretwidth) {
     List<Widget> notes = [];
-    for (int string = 0; string < 6; ++string) { // High e to low e
+    for (int string = 0; string < tunings[currenttuning].length; ++string) { // High e to low e
       // for (int string = 5; string>=0; --string) {
       int note = tunings[currenttuning][string] + fretnum;
       notes.add(
@@ -159,7 +168,11 @@ class _instrumentWidgetState extends State<instrumentWidget> {
             string: string,
             fretwidth: fretwidth,
             inscale: showall ? true : scalenotes.contains(note % 12),
-            inchord: showall ? false : chordnotes.contains(note % 12),
+            // Using in chord for tab at the moment
+            inchord: showall ? false :
+              chordnotes.contains(note % 12),
+            intab: showall|| widget.currenttab==-1 ? false:
+            tab[tabnum].contains(note),
             fretsshown: fretsshown,
             scalepos: (showall || !scalenotes.contains(note % 12))
                 ? null
@@ -216,19 +229,44 @@ class _instrumentWidgetState extends State<instrumentWidget> {
                  value: _tuning,
                   onChanged: (tuning) {
                     setState(() {
-                      print(tuning);
                       _tuning = tuning;
-                      currenttuning = _tunings.indexOf(tuning);
+                      currenttuning = tuningnames.indexOf(tuning);
                     });
                   },
-                  items: _tunings.map((String value) {
+                  items: tuningnames.map((String value) {
                     return new DropdownMenuItem<String>(
                       value: value,
                       child: new Text(value),
                     );
                   }).toList(),
                 ):Container(),
-                Expanded(child: Container(),),
+                Expanded(child: (widget.currenttab != -1) ? Row(
+                  children: <Widget>[
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          if (tabnum>0) tabnum-=1;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.keyboard_arrow_left,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          if (tabnum<tab.length) tabnum+=1;
+                          else tabnum = 0;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.keyboard_arrow_right,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ): Container(),),
                 guitaron ? Slider(
                   value: fretsshown.toDouble(),
                   min: 6.0,

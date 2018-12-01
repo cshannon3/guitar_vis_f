@@ -8,6 +8,7 @@ class guitarNoteWidget extends StatelessWidget {
   final bool inchord;
   final int fretsshown;
   final int scalepos;
+  final bool intab;
 
   guitarNoteWidget({Key key,
     this.note,
@@ -17,6 +18,7 @@ class guitarNoteWidget extends StatelessWidget {
     this.inchord,
     this.fretsshown,
     this.scalepos,
+    this.intab,
   }) : super(key: key);
 
   @override
@@ -30,19 +32,19 @@ class guitarNoteWidget extends StatelessWidget {
               Center(
                 child: Divider(height: fretwidth * (2 / 3), color: Colors.black,),
               ),
-              inscale ?
+              inscale || intab ?
               Padding(
                 padding: const EdgeInsets.only(top: 5.0),
                 child: Opacity(
-                  opacity: inchord ? 0.9 : 0.6,
+                  opacity: inchord || intab ? 0.9 : 0.6,
                   child: Center(
                     child: Container(
-                      width: inchord ? 36.0 - fretsshown : 32.0 - fretsshown,
-                      height: inchord ? 36.0 - fretsshown : 32.0 - fretsshown,
+                      width: inchord || intab ? 36.0 - fretsshown : 32.0 - fretsshown,
+                      height:inchord || intab ? 36.0 - fretsshown : 32.0 - fretsshown,
                       decoration: BoxDecoration(
                         color: getColor((note % 12).toDouble()),
                         shape: BoxShape.circle,
-                        border: inchord ? new Border.all(
+                        border: inchord || intab ? new Border.all(
                           color: Colors.white,
                           width: 2.5,
                         ) : Border(),
@@ -56,7 +58,7 @@ class guitarNoteWidget extends StatelessWidget {
                           text: TextSpan(
                             text: "${scalepos ?? ""} ${notenames[note % 12]}",
                             style: TextStyle(fontSize: 12.0,
-                                color: inchord ? Colors.black : Colors.white,
+                                color: inchord || intab ? Colors.black : Colors.white,
                                 fontWeight: FontWeight.bold),
                           ), // TextSpan
                         ), // Rich Text

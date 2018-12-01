@@ -8,9 +8,15 @@ List<int> majorscale = [0,2,4,5,7,9,11,12,14,16,17,19,21,23,24];
 
 List<int> rootnotes = [4, 9, 14, 19, 23, 28];
 
+List<String> tuningnames = <String>[
+  'EADGBe', 'DADGBe', 'DADGBd', 'DGDGBD','GDAE', 'FBDABD'
+];
+
 List<List<int>> tunings = [[4, 9, 14, 19, 23, 28],[2, 9, 14, 19, 23, 28], // Drop D
 [2, 9, 14, 19, 23, 26], // Double drop d
-[2, 7, 14, 19, 23, 26] // open G
+[2, 7, 14, 19, 23, 26], // open G
+  [19,26,33,40], // Mandolin
+  [7, 11, 14, 19, 23, 26], // custom
 ];
 
 List<String> scalenames = <String>[
@@ -63,3 +69,6 @@ List<List<int>> chords = [[0, 4, 7],// major chord
 Color getColor(double tnote) {
   return Color.lerp(Colors.red, Colors.blue, tnote / 12);
 }
+
+List<List<int>> simpleman = [[9],[11],[12],[19],[16],[12],
+                              [24],[19],[16],[19],[7],[14], [11],[7]];

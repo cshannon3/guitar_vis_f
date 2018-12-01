@@ -32,7 +32,7 @@ class _homeScreenState extends State<homeScreen> {
     });
   }
 
-  void onInputChanged(int _rootnote,int _currentchord , int _tonalhighlight, int _currentscale) {
+  void onInputChanged(int _rootnote,int _currentchord , int _tonalhighlight, int _currentscale, int _currenttab) {
 
     setState(() {
 
@@ -41,6 +41,7 @@ class _homeScreenState extends State<homeScreen> {
           rootnote:  _rootnote,
           tonalhighlight: _tonalhighlight,
           currentscale: _currentscale,
+          currenttab: _currenttab,
           );
 
     });
