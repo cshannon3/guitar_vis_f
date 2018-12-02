@@ -3,8 +3,6 @@ import 'package:guitar_vis_f/Component/guitar_note_widget.dart';
 import 'package:guitar_vis_f/Component/piano_note_widget.dart';
 import 'package:guitar_vis_f/shared_info.dart';
 
-
-
 class instrumentWidget extends StatefulWidget {
   final int tuning;
   final int rootnote;
@@ -13,15 +11,13 @@ class instrumentWidget extends StatefulWidget {
   final int currentchord;
   final int currenttab;
 
-
   instrumentWidget({
-    this.tuning = 4,//0,
+    this.tuning = 0, //0,
     this.rootnote = -1,
-    this.tonalhighlight =0,
+    this.tonalhighlight = 0,
     this.currentscale = -1,
     this.currentchord = -1,
     this.currenttab = -1,
-
   });
 
   @override
@@ -29,8 +25,6 @@ class instrumentWidget extends StatefulWidget {
 }
 
 class _instrumentWidgetState extends State<instrumentWidget> {
-
-
   int fretsshown = 6;
   int keysshown = 10;
   int rootindex;
@@ -42,7 +36,6 @@ class _instrumentWidgetState extends State<instrumentWidget> {
   int currenttuning;
   int tabnum = 0;
 
-
   String _tuning;
 
   @override
@@ -53,14 +46,12 @@ class _instrumentWidgetState extends State<instrumentWidget> {
     _updateValues();
   }
 
-
   @override
   void didUpdateWidget(instrumentWidget oldWidget) {
     print(currenttuning);
     super.didUpdateWidget(oldWidget);
     _updateValues();
   }
-
 
   List<int> _buildscalenoteslist(int _root, int _currentscale) {
     List<int> scale = [];
@@ -70,12 +61,12 @@ class _instrumentWidgetState extends State<instrumentWidget> {
     return scale;
   }
 
-  List<int> _buildhighlights(int _root, int _currentscale,
-      int _tonalhighlight) {
+  List<int> _buildhighlights(
+      int _root, int _currentscale, int _tonalhighlight) {
     List<int> _highlightnotes = [];
     for (int u = 0; u < 6; u += 2) {
-      _highlightnotes.add(
-          (_root + scales[_currentscale][_tonalhighlight + u]) % 12);
+      _highlightnotes
+          .add((_root + scales[_currentscale][_tonalhighlight + u]) % 12);
     }
 
     return _highlightnotes;
@@ -88,17 +79,16 @@ class _instrumentWidgetState extends State<instrumentWidget> {
     }
     return _chordnotes;
   }
-  
 
   void _updateValues() {
     setState(() {
-      if (widget.currenttab != -1 ) {
+      if (widget.currenttab != -1) {
         showall = false;
         tab = simpleman;
         print(tab);
         print(tab.length);
       }
-     /* if (widget.rootnote == -1 ) {
+      /* if (widget.rootnote == -1 ) {
         showall = true;
       }*/
       else if (widget.currentscale != -1) {
@@ -107,18 +97,15 @@ class _instrumentWidgetState extends State<instrumentWidget> {
         scalenotes = _buildscalenoteslist(widget.rootnote, widget.currentscale);
         chordnotes = _buildhighlights(
             widget.rootnote, widget.currentscale, widget.tonalhighlight);
-      }
-      else if (widget.currentchord != -1) {
+      } else if (widget.currentchord != -1) {
         showall = false;
         chordnotes = _buildchordnoteslist(widget.rootnote, widget.currentchord);
         scalenotes = chordnotes;
-      }
-      else {
+      } else {
         showall = true;
       }
     });
   }
-
 
   List<Widget> _buildFrets(double _screenwidth) {
     double fretwidth = _screenwidth / fretsshown;
@@ -143,24 +130,28 @@ class _instrumentWidgetState extends State<instrumentWidget> {
         child: Column(
             children: _buildNotes(fretnum, /*currenttuning,*/ fretwidth)
               ..add(
-                Expanded(child: Center(
-                  child: RichText(
-                    text: TextSpan(
-                      text: "$fretnum",
-                      style: TextStyle(fontSize: 10.0,
-                          color: Colors.black,
-                          fontStyle: FontStyle.normal),
-                    ), // TextSpan
-                  ), // Rich Text))
-                ),
+                Expanded(
+                  child: Center(
+                    child: RichText(
+                      text: TextSpan(
+                        text: "$fretnum",
+                        style: TextStyle(
+                            fontSize: 10.0,
+                            color: Colors.black,
+                            fontStyle: FontStyle.normal),
+                      ), // TextSpan
+                    ), // Rich Text))
+                  ),
                 ),
               )));
   }
 
   List<Widget> _buildNotes(int fretnum, /*int tuning,*/ double fretwidth) {
     List<Widget> notes = [];
-    for (int string = 0; string < tunings[currenttuning].length; ++string) { // High e to low e
-      // for (int string = 5; string>=0; --string) {
+    //for (int string = 0; string < tunings[currenttuning].length; ++string) { // High e to low e
+    for (int string = tunings[currenttuning].length - 1;
+        string >= 0;
+        --string) {
       int note = tunings[currenttuning][string] + fretnum;
       notes.add(
         guitarNoteWidget(
@@ -169,15 +160,14 @@ class _instrumentWidgetState extends State<instrumentWidget> {
             fretwidth: fretwidth,
             inscale: showall ? true : scalenotes.contains(note % 12),
             // Using in chord for tab at the moment
-            inchord: showall ? false :
-              chordnotes.contains(note % 12),
-            intab: showall|| widget.currenttab==-1 ? false:
-            tab[tabnum].contains(note),
+            inchord: showall ? false : chordnotes.contains(note % 12),
+            intab: showall || widget.currenttab == -1
+                ? false
+                : tab[tabnum].contains(note),
             fretsshown: fretsshown,
             scalepos: (showall || !scalenotes.contains(note % 12))
                 ? null
-                : scalenotes.indexOf(note % 12)
-        ),
+                : scalenotes.indexOf(note % 12)),
       );
     }
     return notes;
@@ -192,123 +182,129 @@ class _instrumentWidgetState extends State<instrumentWidget> {
         inscale: showall ? true : scalenotes.contains(note % 12),
         inchord: showall ? false : chordnotes.contains(note % 12),
         keywidth: keywidth,
-      )
-      );
+      ));
     }
     return keys;
   }
 
   @override
   Widget build(BuildContext context) {
-    final double screen_width = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double screen_width = MediaQuery.of(context).size.width;
     return /*Stack(
 
       children: [
 */
-      new Column(
-        children: <Widget>[
-          Container(
-            height: 45.0,
-            width: double.infinity,
-            color: Colors.blue,
-            child: Row(
-              children: [
-                IconButton(
-                    icon: Icon(Icons.refresh),
-                    onPressed: () {
-                      setState(() {
-                        guitaron = !guitaron;
-                      });
-                    }
-                ),
-               guitaron ? new DropdownButton<String>(
-                 isDense: true,
-                 value: _tuning,
-                  onChanged: (tuning) {
+        new Column(
+      children: <Widget>[
+        Container(
+          height: 45.0,
+          width: double.infinity,
+          color: Colors.blue,
+          child: Row(
+            children: [
+              IconButton(
+                  icon: Icon(Icons.refresh),
+                  onPressed: () {
                     setState(() {
-                      _tuning = tuning;
-                      currenttuning = tuningnames.indexOf(tuning);
+                      guitaron = !guitaron;
                     });
-                  },
-                  items: tuningnames.map((String value) {
-                    return new DropdownMenuItem<String>(
-                      value: value,
-                      child: new Text(value),
-                    );
-                  }).toList(),
-                ):Container(),
-                Expanded(child: (widget.currenttab != -1) ? Row(
-                  children: <Widget>[
-                    IconButton(
-                      onPressed: () {
+                  }),
+              guitaron
+                  ? new DropdownButton<String>(
+                      isDense: true,
+                      value: _tuning,
+                      onChanged: (tuning) {
                         setState(() {
-                          if (tabnum>0) tabnum-=1;
+                          _tuning = tuning;
+                          currenttuning = tuningnames.indexOf(tuning);
                         });
                       },
-                      icon: Icon(
-                        Icons.keyboard_arrow_left,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
+                      items: tuningnames.map((String value) {
+                        return new DropdownMenuItem<String>(
+                          value: value,
+                          child: new Text(value),
+                        );
+                      }).toList(),
+                    )
+                  : Container(),
+              Expanded(
+                child: (widget.currenttab != -1)
+                    ? Row(
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                if (tabnum > 0) tabnum -= 1;
+                              });
+                            },
+                            icon: Icon(
+                              Icons.keyboard_arrow_left,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                if (tabnum < tab.length)
+                                  tabnum += 1;
+                                else
+                                  tabnum = 0;
+                              });
+                            },
+                            icon: Icon(
+                              Icons.keyboard_arrow_right,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Container(),
+              ),
+              guitaron
+                  ? Slider(
+                      value: fretsshown.toDouble(),
+                      min: 6.0,
+                      max: 12.0,
+                      divisions: 7,
+                      label: '${fretsshown.round()}',
+                      activeColor: Colors.white,
+                      onChanged: (double newValue) {
                         setState(() {
-                          if (tabnum<tab.length) tabnum+=1;
-                          else tabnum = 0;
+                          fretsshown = newValue.floor();
                         });
                       },
-                      icon: Icon(
-                        Icons.keyboard_arrow_right,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ): Container(),),
-                guitaron ? Slider(
-                  value: fretsshown.toDouble(),
-                  min: 6.0,
-                  max: 12.0,
-                  divisions: 7,
-                  label: '${fretsshown.round()}',
-                  activeColor: Colors.white,
-                  onChanged: (double newValue) {
-                    setState(() {
-                      fretsshown = newValue.floor();
-                    });
-                  },
-
-                ) : Slider(
-                  value: keysshown.toDouble(),
-                  min: 10.0,
-                  max: 24.0,
-                  divisions: 15,
-                  label: '${keysshown.round()}',
-                  activeColor: Colors.white,
-                  onChanged: (double newValue) {
-                    setState(() {
-                      keysshown = newValue.floor();
-                    });
-                  },
-
-                )
-              ],
-            ),
+                    )
+                  : Slider(
+                      value: keysshown.toDouble(),
+                      min: 10.0,
+                      max: 24.0,
+                      divisions: 15,
+                      label: '${keysshown.round()}',
+                      activeColor: Colors.white,
+                      onChanged: (double newValue) {
+                        setState(() {
+                          keysshown = newValue.floor();
+                        });
+                      },
+                    )
+            ],
           ),
-          Container(
-            height: guitaron ? 300.0 - (fretsshown - 6) * 20.0 : 300.0 -
-                keysshown * 10.0,
-            color: Colors.white,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: guitaron ? _buildFrets(screen_width) : _buildKeys(
-                  screen_width),
-            ),
+        ),
+        Container(
+          height: guitaron
+              ? 300.0 - (fretsshown - 6) * 20.0
+              : 300.0 - keysshown * 10.0,
+          color: Colors.white,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children:
+                guitaron ? _buildFrets(screen_width) : _buildKeys(screen_width),
           ),
-          Expanded(child: Container(),)
-        ],
-      );
+        ),
+        Expanded(
+          child: Container(),
+        )
+      ],
+    );
   }
 }
