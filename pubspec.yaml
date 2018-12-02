@@ -30,6 +30,7 @@ flutter:
    - assets/images/clef.png
    - assets/images/sharp.png
    - assets/images/bass.png
+   - assets/images/flat.png
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

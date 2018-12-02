@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guitar_vis_f/shared_info.dart';
+
 class guitarNoteWidget extends StatelessWidget {
   final int note;
   final int string;
@@ -10,7 +11,8 @@ class guitarNoteWidget extends StatelessWidget {
   final int scalepos;
   final bool intab;
 
-  guitarNoteWidget({Key key,
+  guitarNoteWidget({
+    Key key,
     this.note,
     this.string,
     this.fretwidth,
@@ -24,55 +26,67 @@ class guitarNoteWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new GestureDetector(
-      onTap: (){},// => onPressed(note, string),
+      onTap: () {}, // => onPressed(note, string),
       child: Container(
-        height: fretwidth*(2/3),
-        child: Stack(
-            children: <Widget>[
-              Center(
-                child: Divider(height: fretwidth * (2 / 3), color: Colors.black,),
-              ),
-              inscale || intab ?
-              Padding(
-                padding: const EdgeInsets.only(top: 5.0),
-                child: Opacity(
-                  opacity: inchord || intab ? 0.9 : 0.6,
-                  child: Center(
-                    child: Container(
-                      width: inchord || intab ? 36.0 - fretsshown : 32.0 - fretsshown,
-                      height:inchord || intab ? 36.0 - fretsshown : 32.0 - fretsshown,
-                      decoration: BoxDecoration(
-                        color: getColor((note % 12).toDouble()),
-                        shape: BoxShape.circle,
-                        border: inchord || intab ? new Border.all(
-                          color: Colors.white,
-                          width: 2.5,
-                        ) : Border(),
-                      ), // Box Decoration
+        height: fretwidth * (2 / 3),
+        child: Stack(children: <Widget>[
+          Center(
+            child: Divider(
+              height: fretwidth * (2 / 3),
+              color: Colors.black,
+            ),
+          ),
+          inscale || intab
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: Opacity(
+                    opacity: inchord || intab ? 0.9 : 0.6,
+                    child: Center(
+                      child: Container(
+                        width: inchord || intab
+                            ? 36.0 - fretsshown
+                            : 32.0 - fretsshown,
+                        height: inchord || intab
+                            ? 36.0 - fretsshown
+                            : 32.0 - fretsshown,
+                        decoration: BoxDecoration(
+                          color: getColor((note % 12).toDouble()),
+                          shape: BoxShape.circle,
+                          border: inchord || intab
+                              ? new Border.all(
+                                  color: Colors.white,
+                                  width: (note / 12).floorToDouble(), //2.5,
+                                )
+                              : Border(),
+                        ), // Box Decoration
 
-                      child: (fretsshown<9)?OverflowBox(
-                        maxWidth: 30.0,
-                        minWidth: 20.0,
-                        child: Center(child:
-                        RichText(
-                          text: TextSpan(
-                            text: "${scalepos ?? ""} ${notenames[note % 12]}",
-                            style: TextStyle(fontSize: 12.0,
-                                color: inchord || intab ? Colors.black : Colors.white,
-                                fontWeight: FontWeight.bold),
-                          ), // TextSpan
-                        ), // Rich Text
-                        ),
-                      ): Container(), // Center
+                        child: (fretsshown < 9)
+                            ? OverflowBox(
+                                maxWidth: 30.0,
+                                minWidth: 20.0,
+                                child: Center(
+                                  child: RichText(
+                                    text: TextSpan(
+                                      text:
+                                          "${scalepos ?? ""} ${notenames[note % 12]}",
+                                      style: TextStyle(
+                                          fontSize: 12.0,
+                                          color: inchord || intab
+                                              ? Colors.black
+                                              : Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ), // TextSpan
+                                  ), // Rich Text
+                                ),
+                              )
+                            : Container(), // Center
+                      ),
                     ),
-                  ),
-                ), // Container
-              ): Container(), // Padding
-
-            ]
-        ),
+                  ), // Container
+                )
+              : Container(), // Padding
+        ]),
       ),
     ); //Stack
   }
-  }
-
+}
