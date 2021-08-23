@@ -1,4 +1,4 @@
-# guitar_vis_f
+# Guitar Music Theory Visualizer App (Flutter)
 
 A new Flutter application.
 
